@@ -12,7 +12,7 @@ require_once __DIR__ . '/../db.php';
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    die("ID no válido");
+    die("ID no vÃ¡lido");
 }
 
 /* =============================
@@ -22,7 +22,7 @@ if (!$id) {
 function generarSlug($texto)
 {
     $texto = strtolower($texto);
-    $buscar = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'];
+    $buscar = ['Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±', 'Ã¼'];
     $reemplazar = ['a', 'e', 'i', 'o', 'u', 'n', 'u'];
     $texto = str_replace($buscar, $reemplazar, $texto);
     $texto = preg_replace('/[^a-z0-9\s-]/', '', $texto);
@@ -85,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $nombre = $_POST['curso_nombre'] ?? '';
         $slug = generarSlug($nombre);
 
-        $horas = limpiarNumero($_POST['horas_cronologicas'] ?? null);
         $precio = limpiarNumero($_POST['curso_precio'] ?? null, 'float');
 
         /* UPDATE CURSO */
@@ -95,13 +94,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 horas_cronologicas=?, curso_precio=?,
                 curso_director=?, curso_codigo_sence=?,
                 curso_area=?, curso_area_conocimiento=?,
-                curso_contexto=?, curso_objetivo_general=?
+                curso_contexto=?, curso_objetivo_general=?,
+                curso_docente=?, curso_ayudante=?
             WHERE id=?
         ")->execute([
                     $nombre,
                     $slug,
                     $_POST['curso_modalidad'],
-                    $horas,
+                    $_POST['horas_cronologicas'],
                     $precio,
                     $_POST['curso_director'],
                     $_POST['curso_codigo_sence'],
@@ -109,6 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_POST['curso_area_conocimiento'],
                     $_POST['curso_contexto'],
                     $_POST['curso_objetivo_general'],
+                    $_POST['curso_docente'] ?? '',
+                    $_POST['curso_ayudante'] ?? '',
                     $id
                 ]);
 
@@ -220,17 +222,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST">
 
         <!-- =============================
-INFORMACIÓN GENERAL
+INFORMACIÃ“N GENERAL
 ============================= -->
 
-        <h4>Información general</h4>
+        <h4>InformaciÃ³n general</h4>
 
-        <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>">
-        <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?>">
-        <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>">
-        <input name="curso_area_conocimiento" class="form-control mb-2"
-            value="<?= $curso['curso_area_conocimiento'] ?>">
-
+        <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>" placeholder="Nombre del curso">
+        <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>"placeholder="Director">
+        <input name="curso_area_conocimiento" class="form-control mb-2" value="<?= $curso['curso_area_conocimiento'] ?>"placeholder="Area conocimiento">
+        <input name="curso_docente" class="form-control mb-2" value="<?= $curso['curso_docente'] ?? '' ?>"placeholder="Docente">
+        <input name="curso_ayudante" class="form-control mb-2" value="<?= $curso['curso_ayudante'] ?? '' ?>"placeholder="Ayudante">
+        <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>"placeholder="Horas Cronologicas">
         <hr>
 
         <!-- =============================
@@ -262,7 +264,7 @@ PERFIL DE EGRESO
             <?php foreach ($perfil as $p): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="perfil_egreso[]" class="form-control" value="<?= $p['descripcion'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">✖</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -284,7 +286,7 @@ REQUISITOS PREVIOS
             <?php foreach ($requisitos as $r): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="requisitos_previos[]" class="form-control" value="<?= $r['requisito'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">✖</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -306,7 +308,7 @@ CONTINUIDAD
             <?php foreach ($continuidad as $c): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="continuidad[]" class="form-control" value="<?= $c['curso_relacionado'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">✖</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -334,7 +336,7 @@ UNIDADES
                             <?= $i + 1 ?>
                         </strong>
                         <button type="button" class="btn btn-danger btn-sm"
-                            onclick="this.closest('.unidad-item').remove()">✖</button>
+                            onclick="this.closest('.unidad-item').remove()">âœ–</button>
                     </div>
 
                     <input name="unidad_titulo[]" class="form-control mb-2" value="<?= $u['titulo_unidad'] ?>">
@@ -358,7 +360,7 @@ UNIDADES
                             <div class="d-flex mb-2 gap-2 contenido-item">
                                 <input name="contenidos[<?= $i ?>][]" class="form-control" value="<?= $c['contenido'] ?>">
                                 <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="this.parentElement.remove()">✖</button>
+                                    onclick="this.parentElement.remove()">âœ–</button>
                             </div>
                         <?php endforeach; ?>
                     </div>
