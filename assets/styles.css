@@ -1,0 +1,101 @@
+:root {
+  --sidebar-width: 250px;
+  --primary-color: #4e73df;
+  --sidebar-hover-color: #405870;
+  --sidebar-sub-hover-color: #111111;
+  --dark-bg: #2c3e50;
+}
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #f8f9fc;
+}
+#wrapper {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+}
+#sidebar {
+  min-width: var(--sidebar-width);
+  max-width: var(--sidebar-width);
+  background: var(--dark-bg);
+  color: #fff;
+  transition: all 0.3s;
+  min-height: 100vh;
+}
+#sidebar .sidebar-header {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.1);
+}
+#sidebar ul.components {
+  padding: 20px 0;
+}
+#sidebar ul li a {
+  padding: 10px 20px;
+  font-size: 0.95rem;
+  display: block;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+#sidebar ul li > ul li a {
+  padding: 6px 20px;
+  font-size: small;
+  font-weight: 300;
+}
+#sidebar ul li > ul li.active a {
+  background: var(--sidebar-sub-hover-color);
+}
+#sidebar ul li a:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+#sidebar ul li.active > a {
+  color: #fff;
+  background: var(--sidebar-hover-color);
+}
+#content {
+  width: 100%;
+  padding: 20px;
+}
+.card-counter {
+  border-left: 5px solid var(--primary-color);
+  transition: transform 0.2s;
+}
+.card-counter:hover {
+  transform: translateY(-5px);
+}
+.icon-box {
+  font-size: 2rem;
+  opacity: 0.3;
+}
+.table {
+  font-size: 14px;
+}
+.table th,
+.table td {
+  font-size: 14px;
+}
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  font-size: 14px;
+}
+.table tbody tr.row-dx-valid td {
+  background-color: rgba(40, 167, 69, 0.08);
+}
+.table tbody tr.row-dx-invalid td {
+  background-color: rgba(220, 53, 69, 0.08);
+}
+.table-hover tbody tr.row-dx-valid:hover td {
+  background-color: rgba(40, 167, 69, 0.12);
+}
+.table-hover tbody tr.row-dx-invalid:hover td {
+  background-color: rgba(220, 53, 69, 0.12);
+}
+#sidebar ul.collapse.list-unstyled {
+  background-color: #1b2937;
+}
+#sidebar ul.collapse.list-unstyled li a {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
