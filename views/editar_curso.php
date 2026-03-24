@@ -87,30 +87,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $precio = limpiarNumero($_POST['curso_precio'] ?? null, 'float');
 
-        /* UPDATE CURSO */
+        /* =============================
+           DATOS SEGUROS
+        ============================= */
+
+        $curso_modalidad = $_POST['curso_modalidad'] ?? null;
+        $curso_codigo_sence = $_POST['curso_codigo_sence'] ?? null;
+        $curso_area = null;
+        $curso_director = $_POST['curso_director'] ?? null;
+        $curso_area_conocimiento = $_POST['curso_area_conocimiento'] ?? null;
+        $curso_contexto = $_POST['curso_contexto'] ?? null;
+        $curso_objetivo = $_POST['curso_objetivo_general'] ?? null;
+        $curso_docente = $_POST['curso_docente'] ?? null;
+        $curso_ayudante = $_POST['curso_ayudante'] ?? null;
+
+        /* =============================
+           NUMÉRICOS (IMPORTANTE)
+        ============================= */
+
+        $horas = $_POST['horas_cronologicas'] ?? null;
+        $horas = ($horas === '' || $horas === null) ? null : (int) $horas;
+
+        /* =============================
+           UPDATE CURSO
+        ============================= */
+
         $pdo->prepare("
             UPDATE dir_cursos_catalogo SET
-                curso_nombre=?, curso_slug=?, curso_modalidad=?,
-                horas_cronologicas=?, curso_precio=?,
-                curso_director=?, curso_codigo_sence=?,
-                curso_area=?, curso_area_conocimiento=?,
-                curso_contexto=?, curso_objetivo_general=?,
-                curso_docente=?, curso_ayudante=?
-            WHERE id=?
+            curso_nombre = ?, 
+            curso_slug = ?, 
+            curso_modalidad = ?,
+            horas_cronologicas = ?, 
+            curso_precio = ?,
+            curso_director = ?, 
+            curso_codigo_sence = ?,
+            curso_area = ?, 
+            curso_area_conocimiento = ?,
+            curso_contexto = ?, 
+            curso_objetivo_general = ?,
+            curso_docente = ?, 
+            curso_ayudante = ?
+          WHERE id = ?
         ")->execute([
                     $nombre,
                     $slug,
-                    $_POST['curso_modalidad'],
-                    $_POST['horas_cronologicas'],
+                    $curso_modalidad,
+                    $horas,
                     $precio,
-                    $_POST['curso_director'],
-                    $_POST['curso_codigo_sence'],
-                    $_POST['curso_area'],
-                    $_POST['curso_area_conocimiento'],
-                    $_POST['curso_contexto'],
-                    $_POST['curso_objetivo_general'],
-                    $_POST['curso_docente'] ?? '',
-                    $_POST['curso_ayudante'] ?? '',
+                    $curso_director,
+                    $curso_codigo_sence,
+                    $curso_area,
+                    $curso_area_conocimiento,
+                    $curso_contexto,
+                    $curso_objetivo,
+                    $curso_docente,
+                    $curso_ayudante,
                     $id
                 ]);
 
@@ -227,12 +258,24 @@ INFORMACIÃ“N GENERAL
 
         <h4>InformaciÃ³n general</h4>
 
-        <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>" placeholder="Nombre del curso">
-        <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>"placeholder="Director">
-        <input name="curso_area_conocimiento" class="form-control mb-2" value="<?= $curso['curso_area_conocimiento'] ?>"placeholder="Area conocimiento">
-        <input name="curso_docente" class="form-control mb-2" value="<?= $curso['curso_docente'] ?? '' ?>"placeholder="Docente">
-        <input name="curso_ayudante" class="form-control mb-2" value="<?= $curso['curso_ayudante'] ?? '' ?>"placeholder="Ayudante">
-        <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>"placeholder="Horas Cronologicas">
+        <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>"
+            placeholder="Nombre del curso">
+        <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>"
+            placeholder="Director">
+        <input name="curso_area_conocimiento" class="form-control mb-2" value="<?= $curso['curso_area_conocimiento'] ?>"
+            placeholder="Area conocimiento">
+        <input name="curso_docente" class="form-control mb-2" value="<?= $curso['curso_docente'] ?? '' ?>"
+            placeholder="Docente">
+        <input name="curso_ayudante" class="form-control mb-2" value="<?= $curso['curso_ayudante'] ?? '' ?>"
+            placeholder="Ayudante">
+        <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>"
+            placeholder="Horas Cronologicas">
+        <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?? '' ?>"
+            placeholder="Modalidad">
+
+        <input name="curso_codigo_sence" class="form-control mb-2" value="<?= $curso['curso_codigo_sence'] ?? '' ?>"
+            placeholder="Código SENCE">
+
         <hr>
 
         <!-- =============================

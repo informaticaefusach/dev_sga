@@ -280,48 +280,83 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h2>Nuevo Curso</h2>
 
-
     <form method="POST">
 
         <!-- =============================
-INFORMACIÓN GENERAL
-============================= -->
+        INFORMACIÓN GENERAL
+        ============================= -->
 
         <h4>Información general</h4>
 
-        <input name="curso_nombre" class="form-control mb-2" placeholder="Nombre del curso">
-        <input name="curso_modalidad" class="form-control mb-2" placeholder="Modalidad">
-        <input name="curso_director" class="form-control mb-2" placeholder="Director">
-        <input name="curso_area_conocimiento" class="form-control mb-2" placeholder="Área conocimiento">
-        <input name="curso_codigo_sence" class="form-control mb-2" placeholder="Codigo Sence">
-        <input name="horas_cronologicas" class="form-control mb-2" placeholder="Horas Cronologicas">
+        <div class="form-group">
+            <label>Nombre del curso</label>
+            <input name="curso_nombre" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Modalidad</label>
+            <input name="curso_modalidad" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Director</label>
+            <input name="curso_director" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Área de conocimiento</label>
+            <input name="curso_area_conocimiento" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Código SENCE</label>
+            <input name="curso_codigo_sence" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Horas cronológicas</label>
+            <input name="horas_cronologicas" class="form-control">
+        </div>
 
         <hr>
 
         <!-- =============================
-CONTEXTO
-============================= -->
+        CONTEXTO
+        ============================= -->
 
         <h4>Contexto</h4>
-        <textarea name="curso_contexto" class="form-control mb-2"></textarea>
+
+        <div class="form-group">
+            <label>Descripción del contexto</label>
+            <textarea name="curso_contexto" class="form-control"></textarea>
+        </div>
 
         <hr>
 
         <!-- =============================
-OBJETIVO GENERAL
-============================= -->
+        OBJETIVO GENERAL
+        ============================= -->
 
         <h4>Objetivo general</h4>
-        <textarea name="curso_objetivo_general" class="form-control mb-2"></textarea>
+
+        <div class="form-group">
+            <label>Objetivo general del curso</label>
+            <textarea name="curso_objetivo_general" class="form-control"></textarea>
+        </div>
 
         <hr>
 
         <!-- =============================
-PERFIL DE EGRESO
-============================= -->
+        PERFIL DE EGRESO
+        ============================= -->
 
         <h4>Perfil de egreso</h4>
-        <div id="perfil-egreso-container"></div>
+
+        <div class="form-group">
+            <label>Items del perfil de egreso</label>
+            <div id="perfil-egreso-container"></div>
+        </div>
+
         <button type="button" onclick="agregarCampo('perfil-egreso-container','perfil_egreso[]')"
             class="btn btn-secondary mb-3">
             + Item
@@ -330,11 +365,16 @@ PERFIL DE EGRESO
         <hr>
 
         <!-- =============================
-REQUISITOS PREVIOS
-============================= -->
+        REQUISITOS PREVIOS
+        ============================= -->
 
         <h4>Requisitos previos</h4>
-        <div id="requisitos-previos-container"></div>
+
+        <div class="form-group">
+            <label>Requisitos</label>
+            <div id="requisitos-previos-container"></div>
+        </div>
+
         <button type="button" onclick="agregarCampo('requisitos-previos-container','requisitos_previos[]')"
             class="btn btn-secondary mb-3">
             + Item
@@ -343,12 +383,15 @@ REQUISITOS PREVIOS
         <hr>
 
         <!-- =============================
-UNIDADES (CLAVE)
-============================= -->
+        UNIDADES
+        ============================= -->
 
         <h4>Estructura de contenidos</h4>
 
-        <div id="unidades-container"></div>
+        <div class="form-group">
+            <label>Unidades del curso</label>
+            <div id="unidades-container"></div>
+        </div>
 
         <button type="button" onclick="agregarUnidad()" class="btn btn-success mb-3">
             + Unidad
@@ -357,25 +400,49 @@ UNIDADES (CLAVE)
         <hr>
 
         <!-- =============================
-INSIGNIA
-============================= -->
+        INSIGNIA
+        ============================= -->
 
         <h4>Insignia</h4>
-        <textarea name="insignia_descripcion" class="form-control mb-2" placeholder="Descripción"></textarea>
-        <input name="insignia_habilidades" class="form-control mb-2" placeholder="Habilidades">
-        <input name="insignia_criterio" class="form-control mb-2" placeholder="Criterio">
-        <input type="file" name="insignia_imagen" class="form-control mb-2" placeholder="Imagen Insignia">
-        <input name="insignia_url" class="form-control mb-2" placeholder="URL">
+
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea name="insignia_descripcion" class="form-control"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Habilidades</label>
+            <input name="insignia_habilidades" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Criterio</label>
+            <input name="insignia_criterio" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Imagen insignia</label>
+            <input type="file" name="insignia_imagen" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>URL</label>
+            <input name="insignia_url" class="form-control">
+        </div>
 
         <hr>
 
-
         <!-- =============================
-CONTINUIDAD
-============================= -->
+        CONTINUIDAD
+        ============================= -->
 
         <h4>Continuidad</h4>
-        <div id="continuidad-container"></div>
+
+        <div class="form-group">
+            <label>Opciones de continuidad</label>
+            <div id="continuidad-container"></div>
+        </div>
+
         <button type="button" onclick="agregarCampo('continuidad-container','continuidad[]')"
             class="btn btn-secondary mb-3">
             + Item

@@ -145,25 +145,21 @@ try {
                                     <td>
 
                                         <a href="index.php?page=editar_curso&id=<?php echo $curso['id']; ?>"
-                                            class="btn btn-sm btn-warning"
-                                            title="Editar curso">
+                                            class="btn btn-sm btn-warning" title="Editar curso">
 
                                             <i class="fas fa-edit"></i>
 
                                         </a>
 
                                         <a href="index.php?page=ediciones&curso_id=<?php echo $curso['id']; ?>"
-                                            class="btn btn-sm btn-info"
-                                            title="Ver ediciones">
+                                            class="btn btn-sm btn-info" title="Ver ediciones">
 
                                             <i class="fas fa-layer-group"></i>
 
                                         </a>
 
-                                        <a href="../landing/curso/<?php echo $curso['curso_slug']; ?>"
-                                            target="_blank"
-                                            class="btn btn-sm btn-success"
-                                            title="Ver landing">
+                                        <a href="../landing/curso.php?slug=<?= urlencode($curso['curso_slug']) ?>"
+                                            target="_blank" class="btn btn-sm btn-success" title="Ver landing">
 
                                             <i class="fas fa-external-link-alt"></i>
 
