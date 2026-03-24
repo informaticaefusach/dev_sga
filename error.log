@@ -305,3 +305,4 @@
 [Tue Mar 24 07:45:55.888021 2026] [proxy_fcgi:error] [pid 1312950] [client 45.148.10.120:40988] AH01071: Got error 'Primary script unknown'
 [Tue Mar 24 07:46:14.941448 2026] [proxy_fcgi:error] [pid 1312950] [client 45.148.10.120:52256] AH01071: Got error 'Primary script unknown'
 [Tue Mar 24 07:46:27.267893 2026] [proxy_fcgi:error] [pid 1312458] [client 45.148.10.120:43640] AH01071: Got error 'Primary script unknown'
+[Tue Mar 24 09:23:22.728336 2026] [proxy_fcgi:error] [pid 1312458] [client 216.73.216.109:53693] AH01071: Got error 'PHP message: PHP Notice:  session_start(): Ignoring session_start() because a session is already active (started from /var/www/html/bd-cursos/index.php on line 3) in /var/www/html/bd-cursos/views/importar_alumnos.php on line 3'

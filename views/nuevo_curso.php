@@ -35,11 +35,11 @@ function generarSlug($texto)
 
 function limpiarNumero($valor, $tipo = 'int')
 {
-    if (!isset($valor) || $valor === '') {
+    if (!isset($valor) || trim($valor) === '') {
         return null;
     }
 
-    return ($tipo === 'int') ? intval($valor) : floatval($valor);
+    return ($tipo === 'int') ? (int) $valor : (float) $valor;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $nombre,
             $slug,
             $_POST['curso_modalidad'] ?? null,
-            $_POST['horas_cronologicas'] ?? null,
+            $horas,
             $precio,
             $_POST['curso_director'] ?? null,
             $_POST['curso_codigo_sence'] ?? null,
