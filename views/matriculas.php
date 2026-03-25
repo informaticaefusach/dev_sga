@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../config.php';
 
 /* ================================
    FILTROS
@@ -40,6 +41,7 @@ $sql = "
 SELECT
 m.id,
 c.curso_nombre,
+c.curso_slug,
 e.id AS edicion_id,
 a.nombre,
 a.apellido_paterno,
@@ -100,6 +102,7 @@ $matriculas = $stmt->fetchAll();
 $total = count($matriculas);
 $aprobados = count(array_filter($matriculas, fn($m) => $m['aprobado']));
 $reprobados = $total - $aprobados;
+
 
 ?>
 
@@ -298,12 +301,31 @@ TABLA
 
                                         <?php if ($m['certificado_generado']): ?>
 
-                                            <span class="badge bg-success">Generado</span><br>
+                                            <?php
+                                            $slug_carpeta = $m['curso_slug'];
 
-                                            <a href="certificados/<?= $m['archivo_pdf'] ?>" class="btn btn-sm btn-success mt-1"
-                                                download>
-                                                Descargar
-                                            </a>
+                                            $ruta_fisica = BASE_PATH . "/certificados/" . $slug_carpeta . "/" . $m['archivo_pdf'];
+
+                                            if (file_exists($ruta_fisica)) {
+                                                $ruta_certificado = base_url() . "/certificados/" . $slug_carpeta . "/" . $m['archivo_pdf'];
+                                            } else {
+                                                $ruta_certificado = "#";
+                                            }
+                                            ?>
+
+                                            <?php if ($ruta_certificado != "#"): ?>
+
+                                                <span class="badge bg-success">Generado</span><br>
+
+                                                <a href="<?= $ruta_certificado ?>" class="btn btn-success" target="_blank">
+                                                    Descargar
+                                                </a>
+
+                                            <?php else: ?>
+
+                                                <span class="badge bg-warning">Archivo no encontrado</span>
+
+                                            <?php endif; ?>
 
                                         <?php else: ?>
 

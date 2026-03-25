@@ -48,6 +48,7 @@ if ($codigo) {
         a.apellido_paterno,
         a.apellido_materno,
         c.curso_nombre,
+        c.curso_slug,
         c.horas_cronologicas,
         e.fecha_inicio,
         e.fecha_fin
@@ -142,12 +143,9 @@ function fechaEspanol($fecha)
                         <?php if ($data): ?>
 
                             <?php
-                            // 🔥 GENERAR SLUG DEL CURSO
-                            $curso_nombre = $data['curso_nombre'];
+                            $curso_slug = $data['curso_slug'];
 
-                            // Convertir a slug
-                            $curso_slug = preg_replace('/[^A-Za-z0-9]/', '_', strtolower($data['curso_nombre']));
-                            $ruta_certificado = "certificados/" . $curso_slug . "/" . $data['archivo_pdf'];
+                            $ruta_certificado = "/certificados/" . $curso_slug . "/" . $data['archivo_pdf'];
                             ?>
 
                             <h2 class="text-success mb-4">
