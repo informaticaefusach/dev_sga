@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../config.php';
 
 $mensaje = '';
 
@@ -95,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
 
-            $ruta_destino = __DIR__ . "/../landing/img/"; // carpeta raíz img
+            $ruta_destino = IMG_PATH;
 
 
 

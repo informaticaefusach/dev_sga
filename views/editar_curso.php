@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../config.php';
 
 /* =============================
    ID
@@ -52,9 +53,16 @@ $extensiones = ['jpg', 'png', 'webp'];
 $header_actual = null;
 
 foreach ($extensiones as $ext) {
-    $ruta = "landing/img/header{$id}." . $ext;
-    if (file_exists(__DIR__ . "/../" . $ruta)) {
-        $header_actual = $ruta;
+
+    // Ruta física (servidor)
+    $ruta_fisica = IMG_PATH . "header{$id}." . $ext;
+
+
+    if (file_exists($ruta_fisica)) {
+
+        // Ruta pública (navegador)
+        $header_actual = base_url() . "/landing/img/header{$id}." . $ext;
+
         break;
     }
 }
