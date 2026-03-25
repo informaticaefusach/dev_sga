@@ -89,6 +89,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $curso_id = $pdo->lastInsertId();
 
+        /* =============================
+   SUBIR IMAGEN HEADER
+============================= */
+
+        if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
+
+            $ruta_destino = __DIR__ . "/../landing/img/"; // carpeta raíz img
+
+
+
+            $tmp = $_FILES['header_imagen']['tmp_name'];
+
+            // Detectar extensión real
+            $info = getimagesize($tmp);
+
+            if ($info !== false) {
+
+                $mime = $info['mime'];
+
+                switch ($mime) {
+                    case 'image/jpeg':
+                        $ext = 'jpg';
+                        break;
+                    case 'image/png':
+                        $ext = 'png';
+                        break;
+                    case 'image/webp':
+                        $ext = 'webp';
+                        break;
+                    default:
+                        throw new Exception("Formato de imagen no permitido");
+                }
+
+                $nombre_archivo = "header" . $curso_id . "." . $ext;
+
+                $ruta_final = $ruta_destino . $nombre_archivo;
+
+                move_uploaded_file($tmp, $ruta_final);
+
+            } else {
+                throw new Exception("El archivo no es una imagen válida");
+            }
+        }
+
 
         /* =============================
            CATEGORIA
@@ -280,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h2>Nuevo Curso</h2>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
         <!-- =============================
         INFORMACIÓN GENERAL
@@ -316,6 +360,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-group">
             <label>Horas cronológicas</label>
             <input name="horas_cronologicas" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Imagen Header</label>
+            <input type="file" name="header_imagen" class="form-control" accept="image/*">
         </div>
 
         <hr>

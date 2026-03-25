@@ -44,6 +44,20 @@ function limpiarNumero($valor, $tipo = 'int')
 $curso = $pdo->prepare("SELECT * FROM dir_cursos_catalogo WHERE id=?");
 $curso->execute([$id]);
 $curso = $curso->fetch(PDO::FETCH_ASSOC);
+/* =============================
+   VER SI EXISTE HEADER
+============================= */
+
+$extensiones = ['jpg', 'png', 'webp'];
+$header_actual = null;
+
+foreach ($extensiones as $ext) {
+    $ruta = "landing/img/header{$id}." . $ext;
+    if (file_exists(__DIR__ . "/../" . $ruta)) {
+        $header_actual = $ruta;
+        break;
+    }
+}
 
 $perfil = $pdo->prepare("SELECT * FROM dir_cursos_perfil_egreso WHERE curso_id=? ORDER BY orden");
 $perfil->execute([$id]);
@@ -198,6 +212,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
         }
 
+        if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
+
+            $ruta_destino = __DIR__ . "/../landing/img/";
+
+
+            $tmp = $_FILES['header_imagen']['tmp_name'];
+
+            $info = getimagesize($tmp);
+
+            if ($info !== false) {
+
+                $mime = $info['mime'];
+
+                switch ($mime) {
+                    case 'image/jpeg':
+                        $ext = 'jpg';
+                        break;
+                    case 'image/png':
+                        $ext = 'png';
+                        break;
+                    case 'image/webp':
+                        $ext = 'webp';
+                        break;
+                    default:
+                        throw new Exception("Formato de imagen no permitido");
+                }
+
+                // 🔥 BORRAR IMAGEN ANTERIOR (si existe)
+                foreach (['jpg', 'png', 'webp'] as $e) {
+                    $old = $ruta_destino . "header{$id}." . $e;
+                    if (file_exists($old)) {
+                        unlink($old);
+                    }
+                }
+
+                $nombre = "header{$id}." . $ext;
+
+                move_uploaded_file($tmp, $ruta_destino . $nombre);
+
+            } else {
+                throw new Exception("Archivo no válido");
+            }
+        }
+
         /* UNIDADES */
         if (!empty($_POST['unidad_titulo'])) {
 
@@ -250,7 +308,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <h2>Editar Curso</h2>
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
 
         <h4>Información general</h4>
 
@@ -294,6 +352,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Código SENCE</label>
             <input name="curso_codigo_sence" class="form-control mb-2"
                 value="<?= $curso['curso_codigo_sence'] ?? '' ?>">
+        </div>
+
+        <h4>Imagen Header</h4>
+
+        <div class="form-group">
+
+            <?php if ($header_actual): ?>
+                <p class="text-success">
+                    ✔ Este curso YA tiene imagen
+                </p>
+
+                <img src="<?= $header_actual ?>" style="max-width:300px; display:block; margin-bottom:10px;">
+            <?php else: ?>
+                <p class="text-danger">
+                    ⚠ Este curso NO tiene imagen
+                </p>
+            <?php endif; ?>
+
+            <label>Reemplazar / Subir nueva imagen</label>
+            <input type="file" name="header_imagen" class="form-control" accept="image/*">
+
         </div>
 
         <hr>

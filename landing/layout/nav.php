@@ -8,13 +8,13 @@
     </button>
     <div class="collapse navbar-collapse" id="menu">
       <ul class="navbar-nav ml-auto">
-        <li class="nav-item pr-1"><a class="nav-link" href="#inicio">Inicio</a></li>
+        <!--<li class="nav-item pr-1"><a class="nav-link" href="#inicio">Inicio</a></li>
         <li class="nav-item pr-1"><a class="nav-link" href="#contexto">Contexto</a></li>
         <li class="nav-item pr-1"><a class="nav-link" href="#objetivo">Objetivo</a></li>
         <li class="nav-item pr-1"><a class="nav-link" href="#perfil">Perfil</a></li>
         <li class="nav-item pr-1"><a class="nav-link" href="#temario">Temario</a></li>
         <li class="nav-item pr-1"><a class="nav-link" href="#modalidad">Modalidad</a></li>
-        <li class="nav-item pr-1"><a class="nav-link" href="#inscripcion">Contacto</a></li>
+        <li class="nav-item pr-1"><a class="nav-link" href="#inscripcion">Contacto</a></li> -->
       </ul>
     </div>
   </div>
