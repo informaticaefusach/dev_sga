@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule ^([a-zA-Z0-9-]+)/?$ curso.php?slug=$1 [L,QSA]

@@ -252,54 +252,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <form method="POST">
 
-        <!-- =============================
-INFORMACIÃ“N GENERAL
-============================= -->
+        <h4>Información general</h4>
 
-        <h4>InformaciÃ³n general</h4>
+        <div class="form-group">
+            <label>Nombre del curso</label>
+            <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>">
+        </div>
 
-        <input name="curso_nombre" class="form-control mb-2" value="<?= $curso['curso_nombre'] ?>"
-            placeholder="Nombre del curso">
-        <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>"
-            placeholder="Director">
-        <input name="curso_area_conocimiento" class="form-control mb-2" value="<?= $curso['curso_area_conocimiento'] ?>"
-            placeholder="Area conocimiento">
-        <input name="curso_docente" class="form-control mb-2" value="<?= $curso['curso_docente'] ?? '' ?>"
-            placeholder="Docente">
-        <input name="curso_ayudante" class="form-control mb-2" value="<?= $curso['curso_ayudante'] ?? '' ?>"
-            placeholder="Ayudante">
-        <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>"
-            placeholder="Horas Cronologicas">
-        <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?? '' ?>"
-            placeholder="Modalidad">
+        <div class="form-group">
+            <label>Director</label>
+            <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>">
+        </div>
 
-        <input name="curso_codigo_sence" class="form-control mb-2" value="<?= $curso['curso_codigo_sence'] ?? '' ?>"
-            placeholder="Código SENCE">
+        <div class="form-group">
+            <label>Área de conocimiento</label>
+            <input name="curso_area_conocimiento" class="form-control mb-2"
+                value="<?= $curso['curso_area_conocimiento'] ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Docente</label>
+            <input name="curso_docente" class="form-control mb-2" value="<?= $curso['curso_docente'] ?? '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Ayudante</label>
+            <input name="curso_ayudante" class="form-control mb-2" value="<?= $curso['curso_ayudante'] ?? '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Horas cronológicas</label>
+            <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Modalidad</label>
+            <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?? '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Código SENCE</label>
+            <input name="curso_codigo_sence" class="form-control mb-2"
+                value="<?= $curso['curso_codigo_sence'] ?? '' ?>">
+        </div>
 
         <hr>
-
-        <!-- =============================
-CONTEXTO
-============================= -->
 
         <h4>Contexto</h4>
-        <textarea name="curso_contexto" class="form-control mb-2"><?= $curso['curso_contexto'] ?></textarea>
+
+        <div class="form-group">
+            <label>Contexto del curso</label>
+            <textarea name="curso_contexto" class="form-control mb-2"><?= $curso['curso_contexto'] ?></textarea>
+        </div>
 
         <hr>
-
-        <!-- =============================
-OBJETIVO GENERAL
-============================= -->
 
         <h4>Objetivo general</h4>
-        <textarea name="curso_objetivo_general"
-            class="form-control mb-2"><?= $curso['curso_objetivo_general'] ?></textarea>
+
+        <div class="form-group">
+            <label>Objetivo general</label>
+            <textarea name="curso_objetivo_general"
+                class="form-control mb-2"><?= $curso['curso_objetivo_general'] ?></textarea>
+        </div>
 
         <hr>
-
-        <!-- =============================
-PERFIL DE EGRESO
-============================= -->
 
         <h4>Perfil de egreso</h4>
 
@@ -307,7 +323,9 @@ PERFIL DE EGRESO
             <?php foreach ($perfil as $p): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="perfil_egreso[]" class="form-control" value="<?= $p['descripcion'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -319,17 +337,15 @@ PERFIL DE EGRESO
 
         <hr>
 
-        <!-- =============================
-REQUISITOS PREVIOS
-============================= -->
-
         <h4>Requisitos previos</h4>
 
         <div id="requisitos-previos-container">
             <?php foreach ($requisitos as $r): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="requisitos_previos[]" class="form-control" value="<?= $r['requisito'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -341,17 +357,15 @@ REQUISITOS PREVIOS
 
         <hr>
 
-        <!-- =============================
-CONTINUIDAD
-============================= -->
-
         <h4>Continuidad</h4>
 
         <div id="continuidad-container">
             <?php foreach ($continuidad as $c): ?>
                 <div class="d-flex mb-2 gap-2">
                     <input name="continuidad[]" class="form-control" value="<?= $c['curso_relacionado'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">âœ–</button>
+                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -362,10 +376,6 @@ CONTINUIDAD
         </button>
 
         <hr>
-
-        <!-- =============================
-UNIDADES
-============================= -->
 
         <h4>Estructura de contenidos</h4>
 
@@ -378,22 +388,32 @@ UNIDADES
                         <strong>Unidad
                             <?= $i + 1 ?>
                         </strong>
-                        <button type="button" class="btn btn-danger btn-sm"
-                            onclick="this.closest('.unidad-item').remove()">âœ–</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.unidad-item').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
 
-                    <input name="unidad_titulo[]" class="form-control mb-2" value="<?= $u['titulo_unidad'] ?>">
+                    <div class="form-group">
+                        <label>Título unidad</label>
+                        <input name="unidad_titulo[]" class="form-control mb-2" value="<?= $u['titulo_unidad'] ?>">
+                    </div>
 
-                    <textarea name="unidad_objetivo[]" class="form-control mb-2"><?= $u['objetivo_unidad'] ?></textarea>
+                    <div class="form-group">
+                        <label>Objetivo unidad</label>
+                        <textarea name="unidad_objetivo[]" class="form-control mb-2"><?= $u['objetivo_unidad'] ?></textarea>
+                    </div>
 
                     <div class="row mb-2">
                         <div class="col">
+                            <label>Horas teóricas</label>
                             <input name="horas_teoricas[]" class="form-control" value="<?= $u['horas_teoricas'] ?>">
                         </div>
                         <div class="col">
+                            <label>Horas prácticas</label>
                             <input name="horas_practicas[]" class="form-control" value="<?= $u['horas_practicas'] ?>">
                         </div>
                         <div class="col">
+                            <label>Modalidad</label>
                             <input name="modalidad_unidad[]" class="form-control" value="<?= $u['modalidad'] ?>">
                         </div>
                     </div>
@@ -402,8 +422,9 @@ UNIDADES
                         <?php foreach ($contenidosMap[$u['id']] ?? [] as $c): ?>
                             <div class="d-flex mb-2 gap-2 contenido-item">
                                 <input name="contenidos[<?= $i ?>][]" class="form-control" value="<?= $c['contenido'] ?>">
-                                <button type="button" class="btn btn-danger btn-sm"
-                                    onclick="this.parentElement.remove()">âœ–</button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         <?php endforeach; ?>
                     </div>
@@ -423,22 +444,33 @@ UNIDADES
 
         <hr>
 
-        <!-- =============================
-INSIGNIA
-============================= -->
-
         <h4>Insignia</h4>
 
-        <input name="insignia_descripcion" class="form-control mb-2" value="<?= $insignia['descripcion'] ?? '' ?>">
+        <div class="form-group">
+            <label>Descripción</label>
+            <input name="insignia_descripcion" class="form-control mb-2" value="<?= $insignia['descripcion'] ?? '' ?>">
+        </div>
 
-        <input name="insignia_habilidades" class="form-control mb-2" value="<?= $insignia['habilidades'] ?? '' ?>">
+        <div class="form-group">
+            <label>Habilidades</label>
+            <input name="insignia_habilidades" class="form-control mb-2" value="<?= $insignia['habilidades'] ?? '' ?>">
+        </div>
 
-        <input name="insignia_criterio" class="form-control mb-2"
-            value="<?= $insignia['criterio_certificacion'] ?? '' ?>">
+        <div class="form-group">
+            <label>Criterio</label>
+            <input name="insignia_criterio" class="form-control mb-2"
+                value="<?= $insignia['criterio_certificacion'] ?? '' ?>">
+        </div>
 
-        <input name="insignia_imagen" class="form-control mb-2" value="<?= $insignia['imagen'] ?? '' ?>">
+        <div class="form-group">
+            <label>Imagen</label>
+            <input name="insignia_imagen" class="form-control mb-2" value="<?= $insignia['imagen'] ?? '' ?>">
+        </div>
 
-        <input name="insignia_url" class="form-control mb-2" value="<?= $insignia['url_credly'] ?? '' ?>">
+        <div class="form-group">
+            <label>URL</label>
+            <input name="insignia_url" class="form-control mb-2" value="<?= $insignia['url_credly'] ?? '' ?>">
+        </div>
 
         <hr>
 
@@ -448,4 +480,4 @@ INSIGNIA
 
 </div>
 
-<script src="/assets/js/cursos.js"></script>
+<script src="assets/js/cursos.js"></script>

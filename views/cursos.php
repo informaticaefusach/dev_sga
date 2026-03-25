@@ -35,9 +35,7 @@ try {
 
         <div>
 
-            <a href="index.php?page=importar_cursos" class="btn btn-success me-2">
-                <i class="fas fa-file-import"></i> Importar Excel / CSV
-            </a>
+        
 
             <a href="index.php?page=nuevo_curso" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Nuevo Curso
@@ -158,7 +156,7 @@ try {
 
                                         </a>
 
-                                        <a href="../landing/curso.php?slug=<?= urlencode($curso['curso_slug']) ?>"
+                                        <a href="landing/curso.php?slug=<?= urlencode($curso['curso_slug']) ?>"
                                             target="_blank" class="btn btn-sm btn-success" title="Ver landing">
 
                                             <i class="fas fa-external-link-alt"></i>
