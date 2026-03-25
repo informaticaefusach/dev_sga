@@ -222,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
 
-            $ruta_destino = __DIR__ . "/../landing/img/";
+            $ruta_destino = IMG_PATH;
 
 
             $tmp = $_FILES['header_imagen']['tmp_name'];
