@@ -51,7 +51,8 @@ if ($codigo) {
         c.curso_slug,
         c.horas_cronologicas,
         e.fecha_inicio,
-        e.fecha_fin
+        e.fecha_fin,
+        e.version
     FROM dir_cursos_certificados cert
     JOIN dir_cursos_matriculas m ON m.id = cert.matricula_id
     JOIN dir_cursos_alumnos a ON a.id = m.alumno_id
@@ -145,7 +146,12 @@ function fechaEspanol($fecha)
                             <?php
                             $curso_slug = $data['curso_slug'];
 
-                            $ruta_certificado = "/certificados/" . $curso_slug . "/" . $data['archivo_pdf'];
+                            $version = $data['version'] ?? '1';
+
+                            /* dejar solo número */
+                            $version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
+
+                            $ruta_certificado = "/certificados/" . $curso_slug . "_" . $version_slug . "/" . $data['archivo_pdf'];
                             ?>
 
                             <h2 class="text-success mb-4">

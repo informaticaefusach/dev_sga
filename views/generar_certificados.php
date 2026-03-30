@@ -60,7 +60,8 @@ m.nota_final,
 c.curso_nombre,
 c.horas_cronologicas,
 e.fecha_inicio,
-e.fecha_fin
+e.fecha_fin,
+e.version
 FROM dir_cursos_matriculas m
 JOIN dir_cursos_alumnos a ON a.id = m.alumno_id
 JOIN dir_cursos_ediciones e ON e.id = m.edicion_id
@@ -90,20 +91,21 @@ $base_certificados_dir = __DIR__ . '/../certificados/';
 // Tomar nombre del curso (del primer alumno)
 $curso_nombre = $alumnos[0]['curso_nombre'];
 
+$version = $alumnos[0]['version'] ?? '1';
+
+$version_slug = preg_replace('/[^A-Za-z0-9]/', '_', strtolower($version));
+
 // Sanitizar nombre de carpeta
 $curso_slug = preg_replace('/[^A-Za-z0-9]/', '_', strtolower($curso_nombre));
 
 // Ruta final por curso
-$certificados_dir = $base_certificados_dir . $curso_slug . '/';
+$certificados_dir = $base_certificados_dir . $curso_slug . '_v' . $version_slug . '/';
 
 // Crear carpeta si no existe
 if (!file_exists($certificados_dir)) {
-    mkdir($certificados_dir, 0777, true);
+    mkdir($certificados_dir, 0775, true);
 }
 
-if (!file_exists($certificados_dir)) {
-    mkdir($certificados_dir, 0777, true);
-}
 
 $archivos = [];
 $generados = 0;
@@ -210,21 +212,57 @@ foreach ($alumnos as $a) {
        SI SE CREÓ → GUARDAR
     ============================= */
 
-    if (file_exists($pdf)) {
+    if (!file_exists($pdf)) {
+        echo "❌ PDF NO EXISTE: " . $pdf . "<br>";
+        continue;
+    }
+
+    echo "✅ PDF OK: " . $pdf . "<br>";
+
+    /* DEBUG DATOS */
+    echo "<pre>";
+    print_r([
+        'matricula_id' => $a['matricula_id'],
+        'codigo' => $codigo,
+        'archivo' => basename($pdf),
+        'fecha' => $fechaHoy
+    ]);
+    echo "</pre>";
+
+    try {
+
+        $stmtInsert = $pdo->prepare("
+        INSERT INTO dir_cursos_certificados
+        (matricula_id, codigo_certificado, archivo_pdf, fecha_emision)
+        VALUES (?, ?, ?, ?)
+    ");
+
+        $stmtInsert->execute([
+            $a['matricula_id'],
+            $codigo,
+            basename($pdf),
+            $fechaHoy
+        ]);
+
+        echo "✅ INSERT OK - Matricula: " . $a['matricula_id'] . "<br>";
 
         $archivos[] = $pdf;
         $generados++;
 
-        $pdo->prepare("
-            INSERT INTO dir_cursos_certificados
-            (matricula_id, codigo_certificado, archivo_pdf, fecha_emision)
-            VALUES (?, ?, ?, ?)
-        ")->execute([
-                    $a['matricula_id'],
-                    $codigo,
-                    basename($pdf),
-                    $fechaHoy
-                ]);
+    } catch (PDOException $e) {
+
+        echo "💥 ERROR EN INSERT:<br>";
+        echo $e->getMessage() . "<br><br>";
+
+        echo "<b>Datos enviados:</b><br>";
+        print_r([
+            'matricula_id' => $a['matricula_id'],
+            'codigo' => $codigo,
+            'archivo' => basename($pdf),
+            'fecha' => $fechaHoy
+        ]);
+
+        exit;
     }
 
     /* LIMPIAR */

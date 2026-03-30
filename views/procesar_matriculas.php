@@ -57,14 +57,16 @@ try {
         $nota = floatval($nota_excel);
 
         /* convertir 70 → 7.0 */
-        if ($nota > 10) {
+        if ($nota >= 10) {
             $nota = $nota / 10;
         }
 
+        /* límites */
         if ($nota > 7)
             $nota = 7;
         if ($nota < 1)
             $nota = 1;
+
 
         $nota = round($nota, 1);
 
