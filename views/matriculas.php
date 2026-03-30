@@ -43,6 +43,7 @@ m.id,
 c.curso_nombre,
 c.curso_slug,
 e.id AS edicion_id,
+e.version,
 a.nombre,
 a.apellido_paterno,
 a.apellido_materno,
@@ -102,6 +103,9 @@ $matriculas = $stmt->fetchAll();
 $total = count($matriculas);
 $aprobados = count(array_filter($matriculas, fn($m) => $m['aprobado']));
 $reprobados = $total - $aprobados;
+
+$version = $m['version'] ?? '1';
+$version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
 
 
 ?>
@@ -302,7 +306,10 @@ TABLA
                                         <?php if ($m['certificado_generado']): ?>
 
                                             <?php
-                                            $slug_carpeta = $m['curso_slug'];
+                                            $version = $m['version'] ?? '1';
+                                            $version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
+
+                                            $slug_carpeta = $m['curso_slug'] . "_" . $version_slug;
 
                                             $ruta_fisica = BASE_PATH . "/certificados/" . $slug_carpeta . "/" . $m['archivo_pdf'];
 

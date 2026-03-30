@@ -58,6 +58,7 @@ a.apellido_paterno,
 a.apellido_materno,
 m.nota_final,
 c.curso_nombre,
+c.curso_slug,
 c.horas_cronologicas,
 e.fecha_inicio,
 e.fecha_fin,
@@ -91,15 +92,14 @@ $base_certificados_dir = __DIR__ . '/../certificados/';
 // Tomar nombre del curso (del primer alumno)
 $curso_nombre = $alumnos[0]['curso_nombre'];
 
+$curso_slug = $alumnos[0]['curso_slug'];
+
 $version = $alumnos[0]['version'] ?? '1';
+$version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
 
-$version_slug = preg_replace('/[^A-Za-z0-9]/', '_', strtolower($version));
+$carpeta = $curso_slug . '_' . $version_slug;
 
-// Sanitizar nombre de carpeta
-$curso_slug = preg_replace('/[^A-Za-z0-9]/', '_', strtolower($curso_nombre));
-
-// Ruta final por curso
-$certificados_dir = $base_certificados_dir . $curso_slug . '_v' . $version_slug . '/';
+$certificados_dir = $base_certificados_dir . $carpeta . '/';
 
 // Crear carpeta si no existe
 if (!file_exists($certificados_dir)) {
@@ -311,7 +311,7 @@ if ($zip->open($zip_file, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
             <div class="mt-4">
 
                 <?php if ($generados > 0): ?>
-                    <a href="certificados/<?= $curso_slug ?>/<?= basename($zip_file) ?>" class="btn btn-success" download>
+                    <a href="certificados/<?= $carpeta ?>/<?= basename($zip_file) ?>" class="btn btn-success" download>
                         Descargar ZIP
                     </a>
                 <?php endif; ?>
