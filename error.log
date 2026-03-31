@@ -329,3 +329,4 @@
 [Mon Mar 30 16:27:02.752307 2026] [proxy_fcgi:error] [pid 2401246] [client 116.118.2.113:57602] AH01071: Got error 'Primary script unknown'
 [Mon Mar 30 16:27:09.430176 2026] [proxy_fcgi:error] [pid 2398420] [client 161.97.77.0:47670] AH01071: Got error 'Primary script unknown'
 [Mon Mar 30 16:27:09.438421 2026] [proxy_fcgi:error] [pid 2395910] [client 161.97.77.0:47672] AH01071: Got error 'Primary script unknown'
+[Tue Mar 31 09:08:02.419558 2026] [proxy_fcgi:error] [pid 2508344] [client 134.209.39.161:53251] AH01071: Got error 'Primary script unknown'
