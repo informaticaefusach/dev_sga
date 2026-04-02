@@ -47,12 +47,31 @@ function fechaEspanolDiplomado($fecha)
 function slugDiplomado($texto)
 {
     $texto = trim($texto);
-    $texto = mb_strtolower($texto, 'UTF-8');
-    $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+
+    if (function_exists('mb_strtolower')) {
+        $texto = mb_strtolower($texto, 'UTF-8');
+    } else {
+        $texto = strtolower($texto);
+    }
+
+    if (function_exists('iconv')) {
+        $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+    }
+
     $texto = preg_replace('/[^a-z0-9]+/', '-', $texto);
     $texto = trim($texto, '-');
 
     return $texto ?: 'diplomado';
+}
+
+function rutaPdfDiplomado($programa, $archivoPdf)
+{
+    if (!$archivoPdf) {
+        return '';
+    }
+
+    $programa_slug = slugDiplomado($programa);
+    return "/certificados/diplomados/" . $programa_slug . "/" . $archivoPdf;
 }
 
 /* =====================================
@@ -416,6 +435,7 @@ if ($programa !== '') {
                                 <th>Fecha termino</th>
                                 <th>Codigo</th>
                                 <th>Certificado</th>
+                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -460,6 +480,18 @@ if ($programa !== '') {
                                             <span class="text-success">Generado</span>
                                         <?php else: ?>
                                             <span class="text-muted">Pendiente</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <?php if (!empty($r['archivo_pdf'])): ?>
+                                            <a href="<?= htmlspecialchars(rutaPdfDiplomado($r['nombre_programa'], $r['archivo_pdf'])) ?>"
+                                                class="btn btn-sm btn-outline-primary" target="_blank">
+                                                Ver certificado
+                                            </a>
+                                        <?php else: ?>
+                                            <button class="btn btn-sm btn-outline-secondary" disabled>
+                                                Ver certificado
+                                            </button>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
