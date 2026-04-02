@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrega de Certificado</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif; color:#333333;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+        style="width:100%; background-color:#f4f6f8; margin:0; padding:30px 0;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="700" cellspacing="0" cellpadding="0" border="0"
+                    style="width:700px; max-width:700px; background-color:#ffffff; border:1px solid #e5e7eb; border-radius:8px; overflow:hidden;">
+                    <tr>
+                        <td align="center" style="background-color:#003DA5; padding:24px 32px;">
+                            <img src="https://sga.capusach.cl/assets/img/img-logocap.png" alt="Capacitacion USACH"
+                                style="display:block; margin:0 auto; max-width:220px; width:100%; height:auto; border:0;">
+                        </td>
+                    </tr>
+
+
+                    <tr>
+                        <td style="padding:32px;">
+                            <p style="margin:0 0 20px 0; font-size:16px; line-height:1.6;">
+                                Estimado/a <strong>{{nombre_participante}}</strong>,
+                            </p>
+
+                            <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7;">
+                                Recibe un cordial saludo de parte del equipo de Capacitacion USACH.
+                            </p>
+
+                            <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7;">
+                                Queremos agradecerte y felicitarte por haber completado con exito el programa
+                                <strong>{{nombre_del_curso_o_diplomado}}</strong>. Reconocemos tu compromiso,
+                                dedicacion y las habilidades adquiridas durante este proceso formativo; estamos seguros
+                                de que este logro sera un pilar fundamental en tu crecimiento profesional.
+                            </p>
+
+                            <p style="margin:0 0 24px 0; font-size:15px; line-height:1.7;">
+                                Siguiendo nuestros nuevos lineamientos de certificacion digital, compartimos contigo
+                                el acceso directo a tu documentacion oficial.
+                            </p>
+
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0"
+                                style="width:100%; background-color:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; margin:0 0 24px 0;">
+                                <tr>
+                                    <td style="padding:20px 24px;">
+                                        <h2 style="margin:0 0 16px 0; font-size:18px; line-height:1.4; color:#003DA5;">
+                                            Detalles de tu certificacion
+                                        </h2>
+
+                                        <p style="margin:0 0 10px 0; font-size:15px; line-height:1.6;">
+                                            <strong>Programa:</strong> {{nombre_del_curso_o_diplomado}}
+                                        </p>
+
+                                        <p style="margin:0 0 10px 0; font-size:15px; line-height:1.6;">
+                                            <strong>Tipo de documento:</strong> {{tipo_documento}}
+                                        </p>
+
+                                        <p style="margin:0 0 10px 0; font-size:15px; line-height:1.6;">
+                                            <strong>Codigo de validacion:</strong> {{codigo_certificado}}
+                                        </p>
+
+                                        <p style="margin:0 0 20px 0; font-size:15px; line-height:1.6;">
+                                            <strong>Enlace de descarga:</strong>
+                                            <a href="{{link_certificado}}"
+                                                style="color:#003DA5; text-decoration:none; font-weight:bold;">
+                                                Haz clic aqui para descargar tu certificado
+                                            </a>
+                                        </p>
+
+                                        <p style="margin:0; font-size:14px; line-height:1.6; color:#555555;">
+                                            Si el enlace anterior no funciona, copia y pega la siguiente URL en tu
+                                            navegador:
+                                        </p>
+
+                                        <p
+                                            style="margin:8px 0 0 0; font-size:14px; line-height:1.6; word-break:break-all; color:#003DA5;">
+                                            {{link_certificado}}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7;">
+                                Este enlace te llevara a la pagina de validacion oficial, desde donde podras revisar y
+                                descargar la version vigente de tu certificado.
+                            </p>
+
+                            <p style="margin:0 0 16px 0; font-size:15px; line-height:1.7;">
+                                Te motivamos a seguir ampliando tus conocimientos y a mantenerte en contacto con nuestra
+                                comunidad educativa. Gracias por elegir especializarte con nosotros.
+                            </p>
+
+                            <p style="margin:24px 0 0 0; font-size:15px; line-height:1.7;">
+                                Atentamente,<br>
+                                <strong>Equipo de Capacitacion USACH</strong>
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center"
+                            style="background-color:#f3f4f6; padding:20px 32px; font-size:12px; line-height:1.6; color:#6b7280;">
+                            Este correo fue generado automaticamente por el sistema de certificacion.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

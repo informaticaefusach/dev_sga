@@ -3,76 +3,20 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-/* 🔥 IMPORTANTE: ESTO LO HACE PÚBLICO (SIN SIDEBAR) */
+/* PUBLICO */
 $public = true;
 
 require_once __DIR__ . '/../db.php';
 
 /* =============================
-   FUNCION SLUG
-============================= 
-function generarSlug($texto)
-{
-    $texto = strtolower($texto);
-
-    // reemplazar acentos por _
-    $texto = preg_replace('/[áéíóúñü]/u', '_', $texto);
-
-    // reemplazar todo lo que no sea válido por _
-    $texto = preg_replace('/[^a-z0-9]/', '_', $texto);
-
-    // ⚠️ NO limpiar dobles underscores
-    return trim($texto, '_');
-}
-
-/* =============================
-   VALIDAR CÓDIGO
-============================= */
-
-$codigo = trim($_GET['codigo'] ?? '');
-
-if (!preg_match('/^[A-Z0-9]+$/', $codigo)) {
-    $codigo = '';
-}
-
-$data = null;
-
-if ($codigo) {
-
-    $stmt = $pdo->prepare("
-    SELECT 
-        cert.codigo_certificado,
-        cert.fecha_emision,
-        cert.archivo_pdf,
-        a.nombre,
-        a.apellido_paterno,
-        a.apellido_materno,
-        c.curso_nombre,
-        c.curso_slug,
-        c.horas_cronologicas,
-        e.fecha_inicio,
-        e.fecha_fin,
-        e.version
-    FROM dir_cursos_certificados cert
-    JOIN dir_cursos_matriculas m ON m.id = cert.matricula_id
-    JOIN dir_cursos_alumnos a ON a.id = m.alumno_id
-    JOIN dir_cursos_ediciones e ON e.id = m.edicion_id
-    JOIN dir_cursos_catalogo c ON c.id = e.curso_id
-    WHERE cert.codigo_certificado = ?
-    ");
-
-    $stmt->execute([$codigo]);
-    $data = $stmt->fetch(PDO::FETCH_ASSOC);
-}
-
-/* =============================
-   FORMATO FECHA
+   FUNCIONES
 ============================= */
 
 function fechaEspanol($fecha)
 {
-    if (!$fecha)
+    if (!$fecha) {
         return '';
+    }
 
     $meses = [
         1 => 'enero',
@@ -91,12 +35,114 @@ function fechaEspanol($fecha)
 
     $t = strtotime($fecha);
 
+    if (!$t) {
+        return '';
+    }
+
     return date('j', $t) . ' de ' . $meses[(int) date('n', $t)] . ' del ' . date('Y', $t);
 }
 
+function slugTexto($texto)
+{
+    $texto = trim($texto);
+    $texto = mb_strtolower($texto, 'UTF-8');
+    $texto = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $texto);
+    $texto = preg_replace('/[^a-z0-9]+/', '-', $texto);
+    $texto = trim($texto, '-');
 
+    return $texto ?: 'archivo';
+}
 
+/* =============================
+   VALIDAR CODIGO
+============================= */
 
+$codigo = trim($_GET['codigo'] ?? '');
+
+if (!preg_match('/^[A-Z0-9]+$/', $codigo)) {
+    $codigo = '';
+}
+
+$data = null;
+$tipo = null;
+$ruta_certificado = '';
+
+if ($codigo) {
+
+    /* =====================================
+       BUSCAR EN CERTIFICADOS DE CURSOS
+    ===================================== */
+
+    $stmt = $pdo->prepare("
+        SELECT 
+            cert.codigo_certificado,
+            cert.fecha_emision,
+            cert.archivo_pdf,
+            a.nombre,
+            a.apellido_paterno,
+            a.apellido_materno,
+            c.curso_nombre,
+            c.curso_slug,
+            c.horas_cronologicas,
+            e.fecha_inicio,
+            e.fecha_fin,
+            e.version
+        FROM dir_cursos_certificados cert
+        JOIN dir_cursos_matriculas m ON m.id = cert.matricula_id
+        JOIN dir_cursos_alumnos a ON a.id = m.alumno_id
+        JOIN dir_cursos_ediciones e ON e.id = m.edicion_id
+        JOIN dir_cursos_catalogo c ON c.id = e.curso_id
+        WHERE cert.codigo_certificado = ?
+        LIMIT 1
+    ");
+
+    $stmt->execute([$codigo]);
+    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($data) {
+        $tipo = 'curso';
+
+        $curso_slug = $data['curso_slug'];
+        $version = $data['version'] ?? '1';
+        $version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
+
+        $ruta_certificado = "/certificados/" . $curso_slug . "_" . $version_slug . "/" . $data['archivo_pdf'];
+    }
+
+    /* =====================================
+       SI NO EXISTE, BUSCAR EN DIPLOMADOS
+    ===================================== */
+
+    if (!$data) {
+        $stmt = $pdo->prepare("
+            SELECT
+                codigo_certificado,
+                fecha_emision,
+                archivo_pdf,
+                nombre,
+                apellido_paterno,
+                apellido_materno,
+                nombre_programa,
+                horas,
+                fecha_inicio,
+                fecha_termino,
+                tipo_documento
+            FROM dir_diplomados_registros
+            WHERE codigo_certificado = ?
+            LIMIT 1
+        ");
+
+        $stmt->execute([$codigo]);
+        $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($data) {
+            $tipo = 'diplomado';
+
+            $programa_slug = slugTexto($data['nombre_programa']);
+            $ruta_certificado = "/certificados/diplomados/" . $programa_slug . "/" . $data['archivo_pdf'];
+        }
+    }
+}
 
 ?>
 
@@ -105,7 +151,7 @@ function fechaEspanol($fecha)
 
 <head>
     <meta charset="UTF-8">
-    <title>Validación de Certificado</title>
+    <title>Validacion de Certificado</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -143,19 +189,8 @@ function fechaEspanol($fecha)
 
                         <?php if ($data): ?>
 
-                            <?php
-                            $curso_slug = $data['curso_slug'];
-
-                            $version = $data['version'] ?? '1';
-
-                            /* dejar solo número */
-                            $version_slug = 'v' . preg_replace('/[^0-9]/', '', $version);
-
-                            $ruta_certificado = "/certificados/" . $curso_slug . "_" . $version_slug . "/" . $data['archivo_pdf'];
-                            ?>
-
                             <h2 class="text-success mb-4">
-                                ✔ Certificado válido
+                                Certificado valido
                             </h2>
 
                             <h3 class="fw-bold">
@@ -164,41 +199,71 @@ function fechaEspanol($fecha)
                                 <?= htmlspecialchars($data['apellido_materno']) ?>
                             </h3>
 
-                            <p class="text-muted">Ha aprobado el curso</p>
+                            <?php if ($tipo === 'curso'): ?>
 
-                            <h4 class="fw-bold mt-3">
-                                <?= htmlspecialchars($data['curso_nombre']) ?>
-                            </h4>
+                                <p class="text-muted">Ha aprobado el curso</p>
 
-                            <hr>
+                                <h4 class="fw-bold mt-3">
+                                    <?= htmlspecialchars($data['curso_nombre']) ?>
+                                </h4>
 
-                            <p><strong>Duración:</strong>
-                                <?= $data['horas_cronologicas'] ?> horas
-                            </p>
+                                <hr>
+
+                                <p>
+                                    <strong>Duracion:</strong>
+                                    <?= htmlspecialchars($data['horas_cronologicas']) ?> horas
+                                </p>
+
+                                <p>
+                                    <strong>Periodo:</strong><br>
+                                    <?= fechaEspanol($data['fecha_inicio']) ?><br>
+                                    al<br>
+                                    <?= fechaEspanol($data['fecha_fin']) ?>
+                                </p>
+
+                            <?php elseif ($tipo === 'diplomado'): ?>
+
+                                <p class="text-muted">
+                                    <?= htmlspecialchars($data['tipo_documento'] ?: 'Diploma') ?> registrado correctamente
+                                </p>
+
+                                <h4 class="fw-bold mt-3">
+                                    <?= htmlspecialchars($data['nombre_programa']) ?>
+                                </h4>
+
+                                <hr>
+
+                                <p>
+                                    <strong>Duracion:</strong>
+                                    <?= htmlspecialchars($data['horas']) ?> horas
+                                </p>
+
+                                <p>
+                                    <strong>Periodo:</strong><br>
+                                    <?= fechaEspanol($data['fecha_inicio']) ?><br>
+                                    al<br>
+                                    <?= fechaEspanol($data['fecha_termino']) ?>
+                                </p>
+
+                            <?php endif; ?>
 
                             <p>
-                                <strong>Periodo:</strong><br>
-                                <?= fechaEspanol($data['fecha_inicio']) ?><br>
-                                al<br>
-                                <?= fechaEspanol($data['fecha_fin']) ?>
-                            </p>
-
-                            <p>
-                                <strong>Fecha de emisión:</strong><br>
+                                <strong>Fecha de emision:</strong><br>
                                 <?= fechaEspanol($data['fecha_emision']) ?>
                             </p>
 
                             <hr>
 
                             <p class="codigo">
-                                Código de verificación:<br>
+                                Codigo de verificacion:<br>
                                 <strong>
-                                    <?= htmlspecialchars($data['codigo_certificado']) ?>
+                                    <?= htmlspecialchars($tipo === 'curso' ? $data['codigo_certificado'] : $data['codigo_certificado']) ?>
                                 </strong>
                             </p>
 
                             <?php if (!empty($data['archivo_pdf'])): ?>
-                                <a href="<?= $ruta_certificado ?>" class="btn btn-success mt-3" target="_blank">
+                                <a href="<?= htmlspecialchars($ruta_certificado) ?>" class="btn btn-success mt-3"
+                                    target="_blank">
                                     Descargar certificado
                                 </a>
                             <?php endif; ?>
@@ -206,11 +271,11 @@ function fechaEspanol($fecha)
                         <?php else: ?>
 
                             <h2 class="text-danger mb-4">
-                                ❌ Certificado no válido
+                                Certificado no valido
                             </h2>
 
                             <p>
-                                El código ingresado no corresponde a un certificado registrado.
+                                El codigo ingresado no corresponde a un certificado registrado.
                             </p>
 
                         <?php endif; ?>

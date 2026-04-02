@@ -74,7 +74,16 @@ if ($page) {
       'procesar_matriculas' => 'procesar_matriculas',
 
       'generar_certificados' => 'generar_certificados',
-      'verificar_certificado' => 'verificar_certificado'
+      'verificar_certificado' => 'verificar_certificado',
+      'enviar_certificados' => 'enviar_certificados',
+      'importar_diplomados' => 'importar_diplomados',
+      'procesar_importacion_diplomados' => 'procesar_importacion_diplomados',
+      'listado_diplomados' => 'listado_diplomados',
+      'generar_certificados_diplomados' => 'generar_certificados_diplomados',
+      'enviar_diplomados' => 'enviar_diplomados',
+      'revisar_importacion_diplomados' => 'revisar_importacion_diplomados'
+
+
 
    ];
 

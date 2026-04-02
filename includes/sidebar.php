@@ -26,6 +26,15 @@ $isEdicionesActive = in_array($current_view, [
     'editar_edicion'
 ]);
 
+$isDiplomadosActive = in_array($current_view, [
+    'importar_diplomados',
+    'revisar_importacion_diplomados',
+    'procesar_importacion_diplomados',
+    'listado_diplomados',
+    'generar_certificados_diplomados',
+    'enviar_diplomados'
+]);
+
 $isAcademicoActive = in_array($current_view, [
     'matriculas',
     'nueva_matricula',
@@ -182,6 +191,60 @@ $isRelatoresActive = in_array($current_view, [
             </a>
 
         </li>
+
+        <li class="nav-item <?= ($_GET['page'] ?? '') === 'enviar_certificados' ? 'active' : '' ?>">
+            <a class="nav-link" href="index.php?page=enviar_certificados">
+                <i class="fas fa-envelope"></i>
+                <span>Envio de certificados</span>
+            </a>
+        </li>
+
+        <!-- DIPLOMADOS -->
+
+        <li class="<?php echo $isDiplomadosActive ? 'active' : ''; ?>">
+
+            <a class="d-flex align-items-center" data-bs-toggle="collapse" href="#submenuDiplomados" role="button"
+                aria-expanded="<?php echo $isDiplomadosActive ? 'true' : 'false'; ?>">
+
+                <i class="fas fa-graduation-cap me-2"></i>
+                Diplomados
+
+                <i class="fas fa-chevron-down ms-auto small"></i>
+
+            </a>
+
+            <ul class="collapse list-unstyled <?php echo $isDiplomadosActive ? 'show' : ''; ?>" id="submenuDiplomados">
+
+                <li class="<?php echo $current_view == 'importar_diplomados' ? 'active' : ''; ?>">
+                    <a class="ps-4" href="index.php?page=importar_diplomados">
+                        <i class="fas fa-file-excel me-1"></i> Importar Excel
+                    </a>
+                </li>
+
+                <li class="<?php echo $current_view == 'listado_diplomados' ? 'active' : ''; ?>">
+                    <a class="ps-4" href="index.php?page=listado_diplomados">
+                        <i class="fas fa-list me-1"></i> Registros Importados
+                    </a>
+                </li>
+
+                <li class="<?php echo $current_view == 'generar_certificados_diplomados' ? 'active' : ''; ?>">
+                    <a class="ps-4" href="index.php?page=generar_certificados_diplomados">
+                        <i class="fas fa-file-pdf me-1"></i> Generar Diplomas
+                    </a>
+                </li>
+
+                <li class="<?php echo $current_view == 'enviar_diplomados' ? 'active' : ''; ?>">
+                    <a class="ps-4" href="index.php?page=enviar_diplomados">
+                        <i class="fas fa-envelope me-1"></i> Enviar Diplomas
+                    </a>
+                </li>
+
+            </ul>
+
+        </li>
+
+
+
 
 
 

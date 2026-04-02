@@ -9,6 +9,8 @@ require_once __DIR__ . '/../config.php';
 $curso_id = $_GET['curso_id'] ?? '';
 $edicion_id = $_GET['edicion_id'] ?? '';
 $estado = $_GET['estado'] ?? '';
+$filtro_aplicado = ($curso_id !== '' || $edicion_id !== '' || $estado !== '');
+
 
 /* ================================
    CURSOS
@@ -24,20 +26,53 @@ ORDER BY curso_nombre
    EDICIONES
 ================================ */
 
-$ediciones = $pdo->query("
-SELECT 
-e.id,
-c.curso_nombre
-FROM dir_cursos_ediciones e
-JOIN dir_cursos_catalogo c ON c.id = e.curso_id
-ORDER BY e.id DESC
-")->fetchAll();
+$ediciones = [];
+
+if ($curso_id !== '') {
+    $stmt = $pdo->prepare("
+    SELECT 
+    e.id,
+    e.version,
+    e.fecha_inicio,
+    e.fecha_fin
+    FROM dir_cursos_ediciones e
+    WHERE e.curso_id = ?
+    ORDER BY e.id DESC
+    ");
+    $stmt->execute([$curso_id]);
+    $ediciones = $stmt->fetchAll();
+}
+
+/* ================================
+   PLANTILLAS DISPONIBLES
+================================ */
+
+$plantillas_dir = __DIR__ . '/../plantillas';
+$plantillas = [];
+
+if (is_dir($plantillas_dir)) {
+    $archivos = scandir($plantillas_dir);
+
+    foreach ($archivos as $archivo) {
+        if (pathinfo($archivo, PATHINFO_EXTENSION) === 'docx') {
+            $plantillas[] = $archivo;
+        }
+    }
+}
+
+sort($plantillas);
+
+$plantilla_seleccionada = $_GET['plantilla'] ?? 'plantilla_certificado.docx';
+
 
 /* ================================
    CONSULTA PRINCIPAL
 ================================ */
 
-$sql = "
+$matriculas = [];
+
+if ($filtro_aplicado) {
+    $sql = "
 SELECT
 m.id,
 c.curso_nombre,
@@ -67,34 +102,36 @@ ON cert.matricula_id = m.id
 WHERE 1=1
 ";
 
-$params = [];
+    $params = [];
 
-/* FILTROS */
+    /* FILTROS */
 
-if ($curso_id != '') {
-    $sql .= " AND c.id = ?";
-    $params[] = $curso_id;
+    if ($curso_id != '') {
+        $sql .= " AND c.id = ?";
+        $params[] = $curso_id;
+    }
+
+    if ($edicion_id != '') {
+        $sql .= " AND e.id = ?";
+        $params[] = $edicion_id;
+    }
+
+    if ($estado == 'aprobados') {
+        $sql .= " AND m.aprobado = 1";
+    }
+
+    if ($estado == 'reprobados') {
+        $sql .= " AND m.aprobado = 0";
+    }
+
+    $sql .= " ORDER BY m.id DESC";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute($params);
+
+    $matriculas = $stmt->fetchAll();
+
 }
-
-if ($edicion_id != '') {
-    $sql .= " AND e.id = ?";
-    $params[] = $edicion_id;
-}
-
-if ($estado == 'aprobados') {
-    $sql .= " AND m.aprobado = 1";
-}
-
-if ($estado == 'reprobados') {
-    $sql .= " AND m.aprobado = 0";
-}
-
-$sql .= " ORDER BY m.id DESC";
-
-$stmt = $pdo->prepare($sql);
-$stmt->execute($params);
-
-$matriculas = $stmt->fetchAll();
 
 /* ================================
    RESUMEN
@@ -145,7 +182,7 @@ FILTROS
 
                     <div class="col-md-3">
                         <label>Curso</label>
-                        <select name="curso_id" class="form-control">
+                        <select name="curso_id" class="form-control" onchange="this.form.submit()">
                             <option value="">Todos</option>
                             <?php foreach ($cursos as $c): ?>
                                 <option value="<?= $c['id'] ?>" <?= $curso_id == $c['id'] ? 'selected' : '' ?>>
@@ -156,13 +193,18 @@ FILTROS
                     </div>
 
                     <div class="col-md-3">
-                        <label>Edición</label>
-                        <select name="edicion_id" class="form-control">
+                        <label>Edicion</label>
+                        <select name="edicion_id" class="form-control" <?= $curso_id === '' ? 'disabled' : '' ?>>
                             <option value="">Todas</option>
                             <?php foreach ($ediciones as $e): ?>
                                 <option value="<?= $e['id'] ?>" <?= $edicion_id == $e['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($e['curso_nombre']) ?> - Edición
-                                    <?= $e['id'] ?>
+                                    Edicion <?= htmlspecialchars($e['id']) ?>
+                                    <?php if (!empty($e['version'])): ?>
+                                        - Version <?= htmlspecialchars($e['version']) ?>
+                                    <?php endif; ?>
+                                    <?php if (!empty($e['fecha_inicio']) || !empty($e['fecha_fin'])): ?>
+                                        (<?= htmlspecialchars($e['fecha_inicio']) ?> - <?= htmlspecialchars($e['fecha_fin']) ?>)
+                                    <?php endif; ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -192,33 +234,71 @@ FILTROS
 BOTONES
 ============================= -->
 
-    <div class="mb-3">
+    <div class="card shadow-sm mb-3">
+        <div class="card-body">
 
-        <a href="index.php?page=importar_alumnos" class="btn btn-success">
-            Importar Excel
-        </a>
+            <?php if ($edicion_id): ?>
 
-        <button class="btn btn-info">
-            Exportar Excel
-        </button>
+                <form method="GET" action="index.php" class="row g-3 align-items-end">
+                    <input type="hidden" name="page" value="generar_certificados">
+                    <input type="hidden" name="curso_id" value="<?= htmlspecialchars($curso_id) ?>">
+                    <input type="hidden" name="edicion_id" value="<?= htmlspecialchars($edicion_id) ?>">
+                    <input type="hidden" name="estado" value="<?= htmlspecialchars($estado) ?>">
 
-        <?php if ($edicion_id): ?>
+                    <div class="col-md-5">
+                        <label class="form-label">Plantilla de certificado</label>
+                        <select name="plantilla" class="form-control">
+                            <?php foreach ($plantillas as $plantilla): ?>
+                                <option value="<?= htmlspecialchars($plantilla) ?>" <?= $plantilla === $plantilla_seleccionada ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($plantilla) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-            <a href="index.php?page=generar_certificados&edicion_id=<?= $edicion_id ?>" class="btn btn-warning">
+                    <div class="col-md-auto">
+                        <button type="submit" class="btn btn-warning w-100">
+                            Generar certificados
+                        </button>
+                    </div>
 
-                Generar certificados
+                    <div class="col-md-auto">
+                        <a href="index.php?page=enviar_certificados&curso_id=<?= urlencode($curso_id) ?>&edicion_id=<?= urlencode($edicion_id) ?>"
+                            class="btn btn-primary w-100">
+                            Enviar certificados
+                        </a>
+                    </div>
+                </form>
 
-            </a>
+            <?php else: ?>
 
-        <?php else: ?>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label class="form-label">Plantilla de certificado</label>
+                        <select class="form-control" disabled>
+                            <option>Seleccione una edicion primero</option>
+                        </select>
+                    </div>
 
-            <button class="btn btn-warning" disabled>
-                Seleccione una edición
-            </button>
+                    <div class="col-md-auto">
+                        <button class="btn btn-warning w-100" disabled>
+                            Generar certificados
+                        </button>
+                    </div>
 
-        <?php endif; ?>
+                    <div class="col-md-auto">
+                        <button class="btn btn-primary w-100" disabled>
+                            Enviar certificados
+                        </button>
+                    </div>
+                </div>
 
+            <?php endif; ?>
+
+        </div>
     </div>
+
+
 
     <!-- =============================
 TABLA

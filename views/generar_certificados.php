@@ -46,6 +46,11 @@ if (!$edicion_id) {
     die("Edición no especificada");
 }
 
+$plantilla = $_GET['plantilla'] ?? 'plantilla_certificado.docx';
+
+/* permitir solo nombre de archivo, sin rutas */
+$plantilla = basename($plantilla);
+
 /* =====================================
    ALUMNOS APROBADOS
 ===================================== */
@@ -86,7 +91,18 @@ if (!$alumnos) {
    RUTAS
 ===================================== */
 
-$template_path = __DIR__ . '/../plantillas/plantilla_certificado.docx';
+$plantillas_dir = __DIR__ . '/../plantillas/';
+$template_path = $plantillas_dir . $plantilla;
+
+/* fallback seguro a la plantilla original */
+if (!file_exists($template_path)) {
+    $template_path = $plantillas_dir . 'plantilla_certificado.docx';
+}
+
+/* validación final */
+if (!file_exists($template_path)) {
+    die("No se encontró la plantilla del certificado.");
+}
 $base_certificados_dir = __DIR__ . '/../certificados/';
 
 // Tomar nombre del curso (del primer alumno)
