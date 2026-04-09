@@ -112,8 +112,8 @@ a:hover {
 }
 
 .floating-nav .container {
-  background: rgba(7, 36, 86, 0.9);
-  border: 1px solid rgba(83, 182, 174, 0.35);
+  background: color-mix(in srgb, var(--brand-color, #2E3167) 88%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -611,4 +611,6 @@ footer {
   .contact-form-box {
     padding: 12px;
   }
+
+
 }

@@ -89,6 +89,7 @@ $courseData = [
         "modalidad" => $curso['curso_modalidad'] ?? '',
         "horas" => $curso['horas_cronologicas'] ?? '',
         "codigo_sence" => $curso['curso_codigo_sence'] ?? '',
+        "empresa_id" => $curso['empresa_id'] ?? null,
     ],
     "perfil" => $perfil,
     "requisitos" => $requisitos,
