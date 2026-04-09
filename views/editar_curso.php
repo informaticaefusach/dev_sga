@@ -13,7 +13,7 @@ require_once __DIR__ . '/../config.php';
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    die("ID no vÃ¡lido");
+    die("ID no vÃƒÂ¡lido");
 }
 
 /* =============================
@@ -23,7 +23,7 @@ if (!$id) {
 function generarSlug($texto)
 {
     $texto = strtolower($texto);
-    $buscar = ['Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±', 'Ã¼'];
+    $buscar = ['ÃƒÂ¡', 'ÃƒÂ©', 'ÃƒÂ­', 'ÃƒÂ³', 'ÃƒÂº', 'ÃƒÂ±', 'ÃƒÂ¼'];
     $reemplazar = ['a', 'e', 'i', 'o', 'u', 'n', 'u'];
     $texto = str_replace($buscar, $reemplazar, $texto);
     $texto = preg_replace('/[^a-z0-9\s-]/', '', $texto);
@@ -45,6 +45,13 @@ function limpiarNumero($valor, $tipo = 'int')
 $curso = $pdo->prepare("SELECT * FROM dir_cursos_catalogo WHERE id=?");
 $curso->execute([$id]);
 $curso = $curso->fetch(PDO::FETCH_ASSOC);
+
+$empresas = $pdo->query("
+    SELECT id, nombre, sigla
+    FROM empresa_efusach
+    ORDER BY nombre
+")->fetchAll(PDO::FETCH_ASSOC);
+
 /* =============================
    VER SI EXISTE HEADER
 ============================= */
@@ -54,13 +61,12 @@ $header_actual = null;
 
 foreach ($extensiones as $ext) {
 
-    // Ruta física (servidor)
+    // Ruta fÃ­sica (servidor)
     $ruta_fisica = IMG_PATH . "header{$id}." . $ext;
-
 
     if (file_exists($ruta_fisica)) {
 
-        // Ruta pública (navegador)
+        // Ruta pÃºblica (navegador)
         $header_actual = base_url() . "/landing/img/header{$id}." . $ext;
 
         break;
@@ -106,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $nombre = $_POST['curso_nombre'] ?? '';
         $slug = generarSlug($nombre);
+        $empresa_id = !empty($_POST['empresa_id']) ? (int) $_POST['empresa_id'] : null;
 
         $precio = limpiarNumero($_POST['curso_precio'] ?? null, 'float');
 
@@ -124,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $curso_ayudante = $_POST['curso_ayudante'] ?? null;
 
         /* =============================
-           NUMÉRICOS (IMPORTANTE)
+           NUMÃ‰RICOS (IMPORTANTE)
         ============================= */
 
         $horas = $_POST['horas_cronologicas'] ?? null;
@@ -138,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             UPDATE dir_cursos_catalogo SET
             curso_nombre = ?, 
             curso_slug = ?, 
+            empresa_id = ?,
             curso_modalidad = ?,
             horas_cronologicas = ?, 
             curso_precio = ?,
@@ -151,21 +159,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             curso_ayudante = ?
           WHERE id = ?
         ")->execute([
-                    $nombre,
-                    $slug,
-                    $curso_modalidad,
-                    $horas,
-                    $precio,
-                    $curso_director,
-                    $curso_codigo_sence,
-                    $curso_area,
-                    $curso_area_conocimiento,
-                    $curso_contexto,
-                    $curso_objetivo,
-                    $curso_docente,
-                    $curso_ayudante,
-                    $id
-                ]);
+            $nombre,
+            $slug,
+            $empresa_id,
+            $curso_modalidad,
+            $horas,
+            $precio,
+            $curso_director,
+            $curso_codigo_sence,
+            $curso_area,
+            $curso_area_conocimiento,
+            $curso_contexto,
+            $curso_objetivo,
+            $curso_docente,
+            $curso_ayudante,
+            $id
+        ]);
 
         /* LIMPIAR */
         $pdo->prepare("DELETE FROM dir_cursos_perfil_egreso WHERE curso_id=?")->execute([$id]);
@@ -211,20 +220,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (curso_id, descripcion, habilidades, criterio_certificacion, imagen, url_credly)
                 VALUES (?, ?, ?, ?, ?, ?)
             ")->execute([
-                        $id,
-                        $_POST['insignia_descripcion'],
-                        $_POST['insignia_habilidades'],
-                        $_POST['insignia_criterio'],
-                        $_POST['insignia_imagen'],
-                        $_POST['insignia_url']
-                    ]);
+                $id,
+                $_POST['insignia_descripcion'],
+                $_POST['insignia_habilidades'],
+                $_POST['insignia_criterio'],
+                $_POST['insignia_imagen'],
+                $_POST['insignia_url']
+            ]);
         }
 
         if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
 
             $ruta_destino = IMG_PATH;
-
-
             $tmp = $_FILES['header_imagen']['tmp_name'];
 
             $info = getimagesize($tmp);
@@ -247,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new Exception("Formato de imagen no permitido");
                 }
 
-                // 🔥 BORRAR IMAGEN ANTERIOR (si existe)
+                // ðŸ”¥ BORRAR IMAGEN ANTERIOR (si existe)
                 foreach (['jpg', 'png', 'webp'] as $e) {
                     $old = $ruta_destino . "header{$id}." . $e;
                     if (file_exists($old)) {
@@ -260,7 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 move_uploaded_file($tmp, $ruta_destino . $nombre);
 
             } else {
-                throw new Exception("Archivo no válido");
+                throw new Exception("Archivo no vÃ¡lido");
             }
         }
 
@@ -277,15 +284,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (curso_id, numero_unidad, titulo_unidad, objetivo_unidad, horas_teoricas, horas_practicas, modalidad, orden)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ")->execute([
-                            $id,
-                            $i + 1,
-                            $titulo,
-                            $_POST['unidad_objetivo'][$i] ?? '',
-                            limpiarNumero($_POST['horas_teoricas'][$i] ?? ''),
-                            limpiarNumero($_POST['horas_practicas'][$i] ?? ''),
-                            $_POST['modalidad_unidad'][$i] ?? '',
-                            $i + 1
-                        ]);
+                    $id,
+                    $i + 1,
+                    $titulo,
+                    $_POST['unidad_objetivo'][$i] ?? '',
+                    limpiarNumero($_POST['horas_teoricas'][$i] ?? ''),
+                    limpiarNumero($_POST['horas_practicas'][$i] ?? ''),
+                    $_POST['modalidad_unidad'][$i] ?? '',
+                    $i + 1
+                ]);
 
                 $unidad_id = $pdo->lastInsertId();
 
@@ -326,14 +333,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
-            <label>Director</label>
-            <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>">
+            <label>Empresa</label>
+            <select name="empresa_id" class="form-control mb-2">
+                <option value="">Seleccione una empresa</option>
+                <?php foreach ($empresas as $empresa): ?>
+                <option value="<?= $empresa['id'] ?>"
+                    <?= ($curso['empresa_id'] ?? '') == $empresa['id'] ? 'selected' : '' ?>>
+                    <?= htmlspecialchars($empresa['nombre'] . ' (' . $empresa['sigla'] . ')') ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
         </div>
 
         <div class="form-group">
-            <label>Área de conocimiento</label>
-            <input name="curso_area_conocimiento" class="form-control mb-2"
-                value="<?= $curso['curso_area_conocimiento'] ?>">
+            <label>Modalidad</label>
+            <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?? '' ?>">
+        </div>
+
+        <div class="form-group">
+            <label>Director</label>
+            <input name="curso_director" class="form-control mb-2" value="<?= $curso['curso_director'] ?>">
         </div>
 
         <div class="form-group">
@@ -347,13 +366,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
-            <label>Horas cronológicas</label>
-            <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>">
-        </div>
-
-        <div class="form-group">
-            <label>Modalidad</label>
-            <input name="curso_modalidad" class="form-control mb-2" value="<?= $curso['curso_modalidad'] ?? '' ?>">
+            <label>Área de conocimiento</label>
+            <input name="curso_area_conocimiento" class="form-control mb-2"
+                value="<?= $curso['curso_area_conocimiento'] ?>">
         </div>
 
         <div class="form-group">
@@ -362,20 +377,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 value="<?= $curso['curso_codigo_sence'] ?? '' ?>">
         </div>
 
+        <div class="form-group">
+            <label>Horas cronológicas</label>
+            <input name="horas_cronologicas" class="form-control mb-2" value="<?= $curso['horas_cronologicas'] ?>">
+        </div>
+
         <h4>Imagen Header</h4>
 
         <div class="form-group">
 
             <?php if ($header_actual): ?>
-                <p class="text-success">
-                    ✔ Este curso YA tiene imagen
-                </p>
+            <p class="text-success">
+                âœ” Este curso YA tiene imagen
+            </p>
 
-                <img src="<?= $header_actual ?>" style="max-width:300px; display:block; margin-bottom:10px;">
+            <img src="<?= $header_actual ?>" style="max-width:300px; display:block; margin-bottom:10px;">
             <?php else: ?>
-                <p class="text-danger">
-                    ⚠ Este curso NO tiene imagen
-                </p>
+            <p class="text-danger">
+                âš  Este curso NO tiene imagen
+            </p>
             <?php endif; ?>
 
             <label>Reemplazar / Subir nueva imagen</label>
@@ -408,12 +428,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="perfil-egreso-container">
             <?php foreach ($perfil as $p): ?>
-                <div class="d-flex mb-2 gap-2">
-                    <input name="perfil_egreso[]" class="form-control" value="<?= $p['descripcion'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            <div class="d-flex mb-2 gap-2">
+                <input name="perfil_egreso[]" class="form-control" value="<?= $p['descripcion'] ?>">
+                <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             <?php endforeach; ?>
         </div>
 
@@ -428,12 +448,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="requisitos-previos-container">
             <?php foreach ($requisitos as $r): ?>
-                <div class="d-flex mb-2 gap-2">
-                    <input name="requisitos_previos[]" class="form-control" value="<?= $r['requisito'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            <div class="d-flex mb-2 gap-2">
+                <input name="requisitos_previos[]" class="form-control" value="<?= $r['requisito'] ?>">
+                <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             <?php endforeach; ?>
         </div>
 
@@ -448,12 +468,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div id="continuidad-container">
             <?php foreach ($continuidad as $c): ?>
-                <div class="d-flex mb-2 gap-2">
-                    <input name="continuidad[]" class="form-control" value="<?= $c['curso_relacionado'] ?>">
-                    <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
+            <div class="d-flex mb-2 gap-2">
+                <input name="continuidad[]" class="form-control" value="<?= $c['curso_relacionado'] ?>">
+                <button type="button" class="btn btn-danger" onclick="this.parentNode.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
             <?php endforeach; ?>
         </div>
 
@@ -469,58 +489,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div id="unidades-container">
 
             <?php foreach ($unidades as $i => $u): ?>
-                <div class="card mb-3 p-3 unidad-item">
+            <div class="card mb-3 p-3 unidad-item">
 
-                    <div class="d-flex justify-content-between mb-2">
-                        <strong>Unidad
-                            <?= $i + 1 ?>
-                        </strong>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.unidad-item').remove()">
+                <div class="d-flex justify-content-between mb-2">
+                    <strong>Unidad
+                        <?= $i + 1 ?>
+                    </strong>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.unidad-item').remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Título unidad</label>
+                    <input name="unidad_titulo[]" class="form-control mb-2" value="<?= $u['titulo_unidad'] ?>">
+                </div>
+
+                <div class="form-group">
+                    <label>Objetivo unidad</label>
+                    <textarea name="unidad_objetivo[]" class="form-control mb-2"><?= $u['objetivo_unidad'] ?></textarea>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="col">
+                        <label>Horas teóricas</label>
+                        <input name="horas_teoricas[]" class="form-control" value="<?= $u['horas_teoricas'] ?>">
+                    </div>
+                    <div class="col">
+                        <label>Horas prácticas</label>
+                        <input name="horas_practicas[]" class="form-control" value="<?= $u['horas_practicas'] ?>">
+                    </div>
+                    <div class="col">
+                        <label>Modalidad</label>
+                        <input name="modalidad_unidad[]" class="form-control" value="<?= $u['modalidad'] ?>">
+                    </div>
+                </div>
+
+                <div id="contenidos-<?= $i ?>">
+                    <?php foreach ($contenidosMap[$u['id']] ?? [] as $c): ?>
+                    <div class="d-flex mb-2 gap-2 contenido-item">
+                        <input name="contenidos[<?= $i ?>][]" class="form-control" value="<?= $c['contenido'] ?>">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-
-                    <div class="form-group">
-                        <label>Título unidad</label>
-                        <input name="unidad_titulo[]" class="form-control mb-2" value="<?= $u['titulo_unidad'] ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Objetivo unidad</label>
-                        <textarea name="unidad_objetivo[]" class="form-control mb-2"><?= $u['objetivo_unidad'] ?></textarea>
-                    </div>
-
-                    <div class="row mb-2">
-                        <div class="col">
-                            <label>Horas teóricas</label>
-                            <input name="horas_teoricas[]" class="form-control" value="<?= $u['horas_teoricas'] ?>">
-                        </div>
-                        <div class="col">
-                            <label>Horas prácticas</label>
-                            <input name="horas_practicas[]" class="form-control" value="<?= $u['horas_practicas'] ?>">
-                        </div>
-                        <div class="col">
-                            <label>Modalidad</label>
-                            <input name="modalidad_unidad[]" class="form-control" value="<?= $u['modalidad'] ?>">
-                        </div>
-                    </div>
-
-                    <div id="contenidos-<?= $i ?>">
-                        <?php foreach ($contenidosMap[$u['id']] ?? [] as $c): ?>
-                            <div class="d-flex mb-2 gap-2 contenido-item">
-                                <input name="contenidos[<?= $i ?>][]" class="form-control" value="<?= $c['contenido'] ?>">
-                                <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <button type="button" onclick="agregarContenido(<?= $i ?>)" class="btn btn-secondary btn-sm mt-2">
-                        + Contenido
-                    </button>
-
+                    <?php endforeach; ?>
                 </div>
+
+                <button type="button" onclick="agregarContenido(<?= $i ?>)" class="btn btn-secondary btn-sm mt-2">
+                    + Contenido
+                </button>
+
+            </div>
             <?php endforeach; ?>
 
         </div>

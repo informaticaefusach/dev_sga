@@ -1,41 +1,300 @@
+/* =========================
+   BASE
+========================= */
+html,
 body {
-    font-family: Arial;
-    background: #f8f9fa;
+    margin: 0;
+    padding: 0;
 }
 
-.hero {
-    background: #343a40;
-    color: white;
+body {
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    color: #0d2d6c;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* =========================
+   HERO VIDRIADO
+========================= */
+.hero-glass {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
     padding: 80px 0;
 }
 
-.hero h1 {
-    font-size: 42px;
-    font-weight: bold;
+.hero-glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(7, 28, 56, 0.75),
+        rgba(14, 40, 78, 0.45)
+    );
+    z-index: 1;
 }
 
-.hero-desc {
-    font-size: 18px;
+.hero-glass .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* =========================
+   CAJA VIDRIADA
+========================= */
+.glass-box {
+    max-width: 780px;
+    padding: 36px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #ffffff;
+}
+
+.glass-box h1 {
+    margin: 0 0 18px 0;
+    font-size: 52px;
+    line-height: 1.1;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.glass-subtitle {
+    margin: 0 0 24px 0;
+    font-size: 20px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.96);
+}
+
+/* =========================
+   PANEL INTERNO
+========================= */
+.glass-panel {
     margin-top: 10px;
+    padding: 24px 28px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.24);
 }
 
-.hero-meta {
-    margin-top: 20px;
+.glass-panel h3 {
+    margin: 0 0 16px 0;
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.glass-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.glass-list li {
+    margin-bottom: 12px;
+    font-size: 18px;
+    line-height: 1.5;
+    color: #ffffff;
+}
+
+.glass-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.glass-buttons {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.btn-glass-primary,
+.btn-glass-secondary {
+    display: inline-block;
+    padding: 13px 24px;
+    border-radius: 8px;
     font-size: 16px;
+    transition: all 0.2s ease;
 }
 
+.btn-glass-primary {
+    background: #08b7b5;
+    color: #ffffff;
+    font-weight: 700;
+    border: none;
+}
+
+.btn-glass-primary:hover {
+    background: #069d9b;
+    color: #ffffff;
+}
+
+.btn-glass-secondary {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+}
+
+.btn-glass-secondary:hover {
+    background: rgba(255, 255, 255, 0.10);
+    color: #ffffff;
+}
+
+/* =========================
+   SECCIONES
+========================= */
 .section {
     padding: 60px 0;
 }
 
 .section h2 {
     margin-bottom: 20px;
+    font-size: 48px;
+    font-weight: 700;
+    color: #09a3a3;
 }
 
-.section ul {
-    padding-left: 20px;
+.section p,
+.section li,
+.section ol {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #0d2d6c;
 }
 
+.section ul,
 .section ol {
     padding-left: 20px;
+}
+
+/* =========================
+   TABLA TEMARIO
+========================= */
+.table {
+    background: #ffffff;
+}
+
+.table th {
+    background: #0d2d6c;
+    color: #ffffff;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: top;
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+    background: #0d2d6c;
+    color: #ffffff;
+    margin-top: 40px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 992px) {
+    .glass-box h1 {
+        font-size: 42px;
+    }
+
+    .section h2 {
+        font-size: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-glass {
+        min-height: auto;
+        padding: 70px 0;
+    }
+
+    .glass-box {
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .glass-box h1 {
+        font-size: 34px;
+    }
+
+    .glass-subtitle {
+        font-size: 17px;
+    }
+
+    .glass-panel {
+        padding: 20px;
+    }
+
+    .glass-panel h3 {
+        font-size: 19px;
+    }
+
+    .glass-list li {
+        font-size: 16px;
+    }
+
+    .glass-buttons {
+        flex-direction: column;
+    }
+
+    .btn-glass-primary,
+    .btn-glass-secondary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .section {
+        padding: 45px 0;
+    }
+
+    .section h2 {
+        font-size: 34px;
+    }
+
+    .section p,
+    .section li,
+    .section ol {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 576px) {
+    .glass-box h1 {
+        font-size: 28px;
+    }
+
+    .glass-subtitle {
+        font-size: 15px;
+    }
+
+    .section h2 {
+        font-size: 30px;
+    }
 }

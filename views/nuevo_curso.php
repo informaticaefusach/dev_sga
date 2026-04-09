@@ -8,12 +8,18 @@ require_once __DIR__ . '/../config.php';
 
 $mensaje = '';
 
+$empresas = $pdo->query("
+    SELECT id, nombre, sigla
+    FROM empresa_efusach
+    ORDER BY nombre
+")->fetchAll(PDO::FETCH_ASSOC);
+
 function generarSlug($texto)
 {
     $texto = strtolower($texto);
 
     /* REEMPLAZAR ACENTOS */
-    $buscar = ['á', 'é', 'í', 'ó', 'ú', 'ñ', 'ü'];
+    $buscar = ['Ã¡', 'Ã©', 'Ã­', 'Ã³', 'Ãº', 'Ã±', 'Ã¼'];
     $reemplazar = ['a', 'e', 'i', 'o', 'u', 'n', 'u'];
 
     $texto = str_replace($buscar, $reemplazar, $texto);
@@ -55,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $nombre = $_POST['curso_nombre'] ?? '';
         $slug = generarSlug($nombre);
+        $empresa_id = !empty($_POST['empresa_id']) ? (int) $_POST['empresa_id'] : null;
 
         $horas = limpiarNumero($_POST['horas_cronologicas'] ?? null, 'int');
         $precio = limpiarNumero($_POST['curso_precio'] ?? null, 'float');
@@ -65,18 +72,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $pdo->prepare("
             INSERT INTO dir_cursos_catalogo(
-                curso_nombre, curso_slug, curso_modalidad,
+                curso_nombre, curso_slug, empresa_id, curso_modalidad,
                 horas_cronologicas, curso_precio,
                 curso_director, curso_codigo_sence,
                 curso_area, curso_area_conocimiento,
-                curso_contexto, curso_objetivo_general
+                curso_contexto, curso_objetivo_general,
+                curso_docente, curso_ayudante
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->execute([
             $nombre,
             $slug,
+            $empresa_id,
             $_POST['curso_modalidad'] ?? null,
             $horas,
             $precio,
@@ -85,24 +94,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_POST['curso_area'] ?? null,
             $_POST['curso_area_conocimiento'] ?? null,
             $_POST['curso_contexto'] ?? null,
-            $_POST['curso_objetivo_general'] ?? null
+            $_POST['curso_objetivo_general'] ?? null,
+            $_POST['curso_docente'] ?? null,
+            $_POST['curso_ayudante'] ?? null
         ]);
 
         $curso_id = $pdo->lastInsertId();
 
         /* =============================
-   SUBIR IMAGEN HEADER
-============================= */
+           SUBIR IMAGEN HEADER
+        ============================= */
 
         if (isset($_FILES['header_imagen']) && $_FILES['header_imagen']['error'] === 0) {
 
             $ruta_destino = IMG_PATH;
-
-
-
             $tmp = $_FILES['header_imagen']['tmp_name'];
 
-            // Detectar extensión real
+            // Detectar extensiÃ³n real
             $info = getimagesize($tmp);
 
             if ($info !== false) {
@@ -124,16 +132,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 $nombre_archivo = "header" . $curso_id . "." . $ext;
-
                 $ruta_final = $ruta_destino . $nombre_archivo;
 
                 move_uploaded_file($tmp, $ruta_final);
 
             } else {
-                throw new Exception("El archivo no es una imagen válida");
+                throw new Exception("El archivo no es una imagen vÃ¡lida");
             }
         }
-
 
         /* =============================
            CATEGORIA
@@ -145,9 +151,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 INSERT INTO dir_cursos_categorias (nombre, descripcion)
                 VALUES (?, ?)
             ")->execute([
-                        $_POST['categoria'],
-                        $_POST['categoria_descripcion']
-                    ]);
+                $_POST['categoria'],
+                $_POST['categoria_descripcion']
+            ]);
 
             $categoria_id = $pdo->lastInsertId();
 
@@ -157,7 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ")->execute([$curso_id, $categoria_id]);
         }
 
-
         /* =============================
            INSIGNIA
         ============================= */
@@ -165,19 +170,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($_POST['insignia_descripcion'])) {
 
             $pdo->prepare("
-            INSERT INTO dir_cursos_insignias
-            (curso_id, descripcion, habilidades, criterio_certificacion, imagen, url_credly)
-            VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO dir_cursos_insignias
+                (curso_id, descripcion, habilidades, criterio_certificacion, imagen, url_credly)
+                VALUES (?, ?, ?, ?, ?, ?)
             ")->execute([
-                        $curso_id,
-                        $_POST['insignia_descripcion'] ?? null,
-                        $_POST['insignia_habilidades'] ?? null,
-                        $_POST['insignia_criterio'] ?? null,
-                        $_POST['insignia_imagen'] ?? null,
-                        $_POST['insignia_url'] ?? null
-                    ]);
+                $curso_id,
+                $_POST['insignia_descripcion'] ?? null,
+                $_POST['insignia_habilidades'] ?? null,
+                $_POST['insignia_criterio'] ?? null,
+                $_POST['insignia_imagen'] ?? null,
+                $_POST['insignia_url'] ?? null
+            ]);
         }
-
 
         /* =============================
            PERFIL EGRESO
@@ -189,8 +193,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($_POST['perfil_egreso'] as $item) {
 
-                if (trim($item) == '')
+                if (trim($item) == '') {
                     continue;
+                }
 
                 $pdo->prepare("
                     INSERT INTO dir_cursos_perfil_egreso
@@ -202,7 +207,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-
         /* =============================
            REQUISITOS PREVIOS
         ============================= */
@@ -213,8 +217,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($_POST['requisitos_previos'] as $item) {
 
-                if (trim($item) == '')
+                if (trim($item) == '') {
                     continue;
+                }
 
                 $pdo->prepare("
                     INSERT INTO dir_cursos_requisitos_previos
@@ -226,7 +231,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-
         /* =============================
            CONTINUIDAD
         ============================= */
@@ -237,8 +241,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($_POST['continuidad'] as $item) {
 
-                if (trim($item) == '')
+                if (trim($item) == '') {
                     continue;
+                }
 
                 $pdo->prepare("
                     INSERT INTO dir_cursos_continuidad
@@ -250,7 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-
         /* =============================
            UNIDADES + CONTENIDOS
         ============================= */
@@ -261,23 +265,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($_POST['unidad_titulo'] as $i => $titulo) {
 
-                if (trim($titulo) == '')
+                if (trim($titulo) == '') {
                     continue;
+                }
 
                 $pdo->prepare("
                     INSERT INTO dir_cursos_unidades
                     (curso_id, numero_unidad, titulo_unidad, objetivo_unidad, horas_teoricas, horas_practicas, modalidad, orden)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ")->execute([
-                            $curso_id,
-                            $ordenUnidad,
-                            $titulo,
-                            $_POST['unidad_objetivo'][$i] ?? '',
-                            limpiarNumero($_POST['horas_teoricas'][$i] ?? '', 'int'),
-                            limpiarNumero($_POST['horas_practicas'][$i] ?? '', 'int'),
-                            $_POST['modalidad_unidad'][$i] ?? '',
-                            $ordenUnidad
-                        ]);
+                    $curso_id,
+                    $ordenUnidad,
+                    $titulo,
+                    $_POST['unidad_objetivo'][$i] ?? '',
+                    limpiarNumero($_POST['horas_teoricas'][$i] ?? '', 'int'),
+                    limpiarNumero($_POST['horas_practicas'][$i] ?? '', 'int'),
+                    $_POST['modalidad_unidad'][$i] ?? '',
+                    $ordenUnidad
+                ]);
 
                 $unidad_id = $pdo->lastInsertId();
 
@@ -287,18 +292,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     foreach ($_POST['contenidos'][$i] as $contenido) {
 
-                        if (trim($contenido) == '')
+                        if (trim($contenido) == '') {
                             continue;
+                        }
 
                         $pdo->prepare("
                             INSERT INTO dir_cursos_unidades_contenidos
                             (unidad_id, contenido, orden)
                             VALUES (?, ?, ?)
                         ")->execute([
-                                    $unidad_id,
-                                    $contenido,
-                                    $ordenContenido
-                                ]);
+                            $unidad_id,
+                            $contenido,
+                            $ordenContenido
+                        ]);
 
                         $ordenContenido++;
                     }
@@ -328,7 +334,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="POST" enctype="multipart/form-data">
 
         <!-- =============================
-        INFORMACIÓN GENERAL
+        INFORMACIÃ“N GENERAL
         ============================= -->
 
         <h4>Información general</h4>
@@ -339,6 +345,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <div class="form-group">
+            <label>Empresa</label>
+            <select name="empresa_id" class="form-control">
+                <option value="">Seleccione una empresa</option>
+                <?php foreach ($empresas as $empresa): ?>
+                <option value="<?= $empresa['id'] ?>">
+                    <?= htmlspecialchars($empresa['nombre'] . ' (' . $empresa['sigla'] . ')') ?>
+                </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label>Modalidad</label>
             <input name="curso_modalidad" class="form-control">
         </div>
@@ -346,6 +364,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="form-group">
             <label>Director</label>
             <input name="curso_director" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Docente</label>
+            <input name="curso_docente" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label>Ayudante</label>
+            <input name="curso_ayudante" class="form-control">
         </div>
 
         <div class="form-group">
