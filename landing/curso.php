@@ -68,13 +68,28 @@ $continuidad = getList($pdo, "SELECT curso_relacionado FROM dir_cursos_continuid
 
 $stmt = $pdo->prepare("SELECT * FROM dir_cursos_unidades WHERE curso_id=? ORDER BY orden");
 $stmt->execute([$curso_id]);
-$unidades = $stmt->fetchAll();
+$unidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-foreach ($unidades as &$u) {
-    $stmt = $pdo->prepare("SELECT contenido FROM dir_cursos_unidades_contenidos WHERE unidad_id=? ORDER BY orden");
-    $stmt->execute([$u['id']]);
-    $u['contenidos'] = $stmt->fetchAll(PDO::FETCH_COLUMN);
+// Agregar contenidos SIN usar referencias (&)
+foreach ($unidades as $key => $u) {
+    $stmtCont = $pdo->prepare("
+        SELECT contenido 
+        FROM dir_cursos_unidades_contenidos 
+        WHERE unidad_id=? 
+        ORDER BY orden
+    ");
+    $stmtCont->execute([$u['id']]);
+
+    $contenidos = $stmtCont->fetchAll(PDO::FETCH_COLUMN);
+
+    // eliminar posibles duplicados (defensivo)
+    $contenidos = array_values(array_unique($contenidos));
+
+    $unidades[$key]['contenidos'] = $contenidos;
 }
+
+// limpiar variable por seguridad (buena práctica)
+unset($u);
 
 /* =============================
    DATA DIRECTA (SIN JSON)
